@@ -1,4 +1,4 @@
-<html lang="zh">
+<html lang="zh-CN">
 
 <head>
   <meta charset="utf-8">
@@ -78,6 +78,45 @@
                     <label for="SaveDays_{{$i}}" class="col-sm-2 col-form-label">保存天数</label>
                     <div class="col-sm-10">
                       <input type="number" class="form-control" name="SaveDays" id="SaveDays_{{$i}}" value="{{$v.SaveDays}}" min="1">
+                    </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <label for="StartTime_{{$i}}" class="col-sm-2 col-form-label">备份起始时间</label>
+                    <div class="col-sm-10">
+                      <select class="form-control" name="StartTime" id="StartTime_{{$i}}" value="{{$v.StartTime}}">
+                        <option value="0" {{if eq $v.StartTime 0}}selected{{end}}>0:00</option>
+                        <option value="1" {{if eq $v.StartTime 1}}selected{{end}}>1:00</option>
+                        <option value="2" {{if eq $v.StartTime 2}}selected{{end}}>2:00</option>
+                        <option value="3" {{if eq $v.StartTime 3}}selected{{end}}>3:00</option>
+                        <option value="4" {{if eq $v.StartTime 4}}selected{{end}}>4:00</option>
+                        <option value="5" {{if eq $v.StartTime 5}}selected{{end}}>5:00</option>
+                        <option value="6" {{if eq $v.StartTime 6}}selected{{end}}>6:00</option>
+                        <option value="7" {{if eq $v.StartTime 7}}selected{{end}}>7:00</option>
+                        <option value="8" {{if eq $v.StartTime 8}}selected{{end}}>8:00</option>
+                        <option value="9" {{if eq $v.StartTime 9}}selected{{end}}>9:00</option>
+                        <option value="10" {{if eq $v.StartTime 10}}selected{{end}}>10:00</option>
+                        <option value="11" {{if eq $v.StartTime 11}}selected{{end}}>11:00</option>
+                        <option value="12" {{if eq $v.StartTime 12}}selected{{end}}>12:00</option>
+                        <option value="13" {{if eq $v.StartTime 13}}selected{{end}}>13:00</option>
+                        <option value="14" {{if eq $v.StartTime 14}}selected{{end}}>14:00</option>
+                        <option value="15" {{if eq $v.StartTime 15}}selected{{end}}>15:00</option>
+                        <option value="16" {{if eq $v.StartTime 16}}selected{{end}}>16:00</option>
+                        <option value="17" {{if eq $v.StartTime 17}}selected{{end}}>17:00</option>
+                        <option value="18" {{if eq $v.StartTime 18}}selected{{end}}>18:00</option>
+                        <option value="19" {{if eq $v.StartTime 19}}selected{{end}}>19:00</option>
+                        <option value="20" {{if eq $v.StartTime 20}}selected{{end}}>20:00</option>
+                        <option value="21" {{if eq $v.StartTime 21}}selected{{end}}>21:00</option>
+                        <option value="22" {{if eq $v.StartTime 22}}selected{{end}}>22:00</option>
+                        <option value="23" {{if eq $v.StartTime 23}}selected{{end}}>23:00</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <label for="Period_{{$i}}" class="col-sm-2 col-form-label">备份周期(分钟)</label>
+                    <div class="col-sm-10">
+                      <input type="number" class="form-control" name="Period" id="Period_{{$i}}" value="{{$v.Period}}" min="1">
                     </div>
                   </div>
 

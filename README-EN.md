@@ -3,8 +3,8 @@
   - [x] Support custom commands.
   - [x] Obsolete files will be deleted automatically.
   - [x] Support the backup files copy to simple data storage(s3).
-  - [x] Automatic backup in everyday night.
-  - [x] Webhook support
+  - [x] Support backup period.
+  - [x] Webhook support.
 
 ## use in docker
   ```

@@ -4,13 +4,14 @@
 
   带Web界面的数据库/文件备份增强工具。原理：执行自定义shell命令输出文件，增强备份功能。同时支持: 文件、mysql、postgres... [English](README-EN.md)
   - [x] 支持自定义命令
-  - [x] 网页中配置，简单又方便
+  - [x] 支持执行shell输出的文件备份，原理上支持各种数据库/文件备份
+  - [x] 支持备份周期设置，几分钟到一年的备份周期也可以
   - [x] 支持多个项目备份，最多16个
   - [x] 支持备份后的文件另存到对象存储中 (在也怕删库跑路了)
-  - [x] 每日凌晨自动备份
   - [x] 可设置备份文件最大保存天数
   - [x] 可设置登陆用户名密码，默认为空
   - [x] webhook通知
+  - [x] 网页中配置，简单又方便
 
 ## docker中使用
 - 运行docker容器
@@ -72,7 +73,4 @@
   - RequestBody中输入 `{"msgtype": "text","text": {"content": "#{projectName}项目备份#{result},文件名:#{fileName},文件大小:#{fileSize}"}}`
 
 ## 说明
-  - v1版本开始发生重要变化，不兼容0.0.x
-  - v1后开始使用web方式来配置
-  - 如要加入https，可通过nginx代理
-  - v2版本后，一个镜像同时支持postgres/mysql
+  - 从backup-db发展而来，发现不仅仅支持数据库备份，所以改名backup-x，备份届的iphone-x

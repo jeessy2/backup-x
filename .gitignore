@@ -1,0 +1,4 @@
+*.exe*
+__debug_bin
+backup-x-files
+.DS_Store

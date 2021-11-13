@@ -1,0 +1,270 @@
+<html lang="zh">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="jie">
+  <title>backup-x</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/common.css">
+  <script src="/static/jquery-3.5.1.min.js"></script>
+  <script src="/static/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <header>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+      <div class="container d-flex justify-content-between">
+        <a href="/" class="navbar-brand d-flex align-items-center">
+          <strong>backup-x</strong>
+        </a>
+      </div>
+    </div>
+  </header>
+  
+  <main role="main" style="margin-top: 30px">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <form>
+
+          <button class="btn btn-primary submit_btn" style="margin-bottom: 15px;">Save</button>
+
+          <div class="alert alert-success" style="display: none;">
+            <strong id="resultMsg">保存成功</strong>
+          </div>
+
+          <div class="portlet">
+            <h5 class="portlet__head">备份设置</h5>
+            <div class="portlet__body">
+              <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                  {{range $i, $v := .BackupConfig}}
+                  <a class="nav-item nav-link {{if eq $i 0}}active{{end}}" id="id_{{$i}}" data-toggle="tab" href="#content_{{$i}}" role="tab">
+                    {{if eq $v.ProjectName ""}}
+                    {{$i}}
+                    {{else}}
+                    {{$v.ProjectName}}
+                    {{end}}
+                  </a>
+                  {{end}}
+                </div>
+              </nav>
+              <div class="tab-content" id="nav-tabContent">
+                {{range $i, $v := .BackupConfig}}
+                <div class="tab-pane fade {{if eq $i 0}}show active{{end}}" id="content_{{$i}}" role="tabpanel">
+                  <br/>
+                  <div class="form-group row">
+                    <label for="ProjectName_{{$i}}" class="col-sm-2 col-form-label">项目名称</label>
+                    <div class="col-sm-10">
+                      <input class="form-control" name="ProjectName" id="ProjectName_{{$i}}" rows="3" value="{{$v.ProjectName}}" onchange="projectNameChange(this)" aria-describedby="ProjectName_help">
+                      <small id="ProjectName_help" class="form-text text-muted">请输入项目名称，一般取数据库名称，并确保名称不重复</small>
+                    </div>
+                  </div>
+            
+                  <div class="form-group row">
+                    <label for="Command_{{$i}}" class="col-sm-2 col-form-label">备份脚本</label>
+                    <div class="col-sm-10">
+                      <textarea class="form-control" name="Command" id="Command_{{$i}}" rows="3" aria-describedby="Command_help">{{$v.Command}}</textarea>
+                      <small id="Command_help" class="form-text text-muted">
+                        须包含#{DATE}变量 <a target="blank" href="https://github.com/jeessy2/backup-x#备份脚本参考">备份脚本参考</a> 
+                        <br/>例：mysqldump -h192.168.1.11 -uroot -p123456 db-name > #{DATE}.sql
+                      </small>
+                    </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <label for="SaveDays_{{$i}}" class="col-sm-2 col-form-label">保存天数</label>
+                    <div class="col-sm-10">
+                      <input type="number" class="form-control" name="SaveDays" id="SaveDays_{{$i}}" value="{{$v.SaveDays}}" min="1">
+                    </div>
+                  </div>
+
+                </div>
+                {{end}}
+              </div>
+
+            </div>
+          </div>
+
+          <div class="portlet">
+            <h5 class="portlet__head">服务配置</h5>
+            <div class="portlet__body">
+
+              <div class="form-group row">
+                <label for="Username" class="col-sm-2 col-form-label">登录用户名</label>
+                <div class="col-sm-10">
+                  <input class="form-control" name="Username" id="Username" value="{{.Username}}" aria-describedby="Username_help">
+                  <small id="Username_help" class="form-text text-muted">强烈建议输入</small>
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="Password" class="col-sm-2 col-form-label">登录密码</label>
+                <div class="col-sm-10">
+                  <input class="form-control" type="password" name="Password" id="Password" value="{{.Password}}" aria-describedby="password_help">
+                  <small id="password_help" class="form-text text-muted">强烈建议输入</small>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="portlet">
+            <h5 class="portlet__head">Webhook通知</h5>
+            <div class="portlet__body">
+
+              <div class="form-group row">
+                <label for="WebhookURL" class="col-sm-2 col-form-label">URL</label>
+                <div class="col-sm-10">
+                  <input class="form-control" name="WebhookURL" id="WebhookURL" value="{{.WebhookURL}}" aria-describedby="WebhookURL_help">
+                  <small id="WebhookURL_help" class="form-text text-muted">
+                    <a target="blank" href="https://github.com/jeessy2/backup-x#webhook">点击参考官方Webhook说明</a><br/>
+                    支持的变量#{projectName}, #{fileName}, #{fileSize}, #{result}, 
+                  </small>
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="WebhookRequestBody" class="col-sm-2 col-form-label">RequestBody</label>
+                <div class="col-sm-10">
+                  <textarea class="form-control" id="WebhookRequestBody" name="WebhookRequestBody" rows="3" aria-describedby="WebhookRequestBody_help">
+{{- .WebhookRequestBody -}}
+                  </textarea>
+                  <small id="WebhookRequestBody_help" class="form-text text-muted">
+                    RequestBody为空GET请求，不为空POST请求。支持的变量同上
+                  </small>
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label"></label>
+                <div class="col-sm-10">
+                  <button class="btn btn-primary btn-sm" id="webhookTestBtn" aria-describedby="webhookTestBtn_help">模拟测试Webhook</button>
+                  <small id="webhookTestBtn_help" class="form-text text-muted"></small>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="portlet">
+            <h5 class="portlet__head">对象存储配置</h5>
+            <div class="portlet__body">
+
+              <div class="form-group row">
+                <label for="Endpoint" class="col-sm-2 col-form-label">Endpoint</label>
+                <div class="col-sm-10">
+                  <input class="form-control" name="Endpoint" id="Endpoint" value="{{.Endpoint}}" aria-describedby="Endpoint_help">
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="AccessKey" class="col-sm-2 col-form-label">AccessKey</label>
+                <div class="col-sm-10">
+                  <input class="form-control" name="AccessKey" id="AccessKey" value="{{.AccessKey}}" aria-describedby="AccessKey_help">
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="SecretKey" class="col-sm-2 col-form-label">SecretKey</label>
+                <div class="col-sm-10">
+                  <input class="form-control" name="SecretKey" id="SecretKey" value="{{.SecretKey}}" aria-describedby="SecretKey_help">
+                </div>
+              </div>
+
+              <div class="form-group row">
+                <label for="BucketName" class="col-sm-2 col-form-label">BucketName</label>
+                <div class="col-sm-10">
+                  <input class="form-control" name="BucketName" id="BucketName" value="{{.BucketName}}" aria-describedby="BucketName_help">
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <button class="btn btn-primary submit_btn" style="margin-bottom: 15px;">Save</button>
+
+        </form>
+      </div>
+
+      <div class="col-md-3">
+        <p class="font-weight-light text-break" style="margin-top: 115px;font-size: 13px;" id="logs"></p>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+
+    $(function(){
+      $(".submit_btn").on('click',function(e) {
+        e.preventDefault();
+        $('body').animate({ scrollTop: 0 }, 300);
+        $.ajax({
+          method: "POST",
+          url: "/save",
+          data: $('form').serialize(),
+          success: function (result) {
+            $('.alert').css("display", "block");
+            if (result !== "ok") {
+              $('.alert').addClass("alert-danger")
+              $('#resultMsg').html(result)
+            } else {
+              // ok
+              setTimeout(function(){
+                $('.alert').css("display", "none");
+              }, 3000)
+            }
+          },
+          error: function(jqXHR) {
+            alert(jqXHR.statusText);
+          }
+        })
+      })
+
+    })
+
+    // projectNameChange
+    function projectNameChange(that) {
+      let id = $(that).attr("id").split("_")[1]
+      console.log($(that).val())
+      $("#id_"+id).html($(that).val())
+    }
+
+  </script>
+
+  <script>
+    function getLogs() {
+      $.get("/logs", function(result){
+        $("#logs").html(result)
+      })
+    }
+    getLogs()
+    setInterval(getLogs, 5 * 1000)
+  </script>
+
+  <script>
+    $(function(){
+      $("#webhookTestBtn").on("click", function(e) {
+        e.preventDefault();
+        $.ajax({
+            method: "POST",
+            url: "/webhookTest",
+            data: {"URL": $("#WebhookURL").val(), "RequestBody": $("#WebhookRequestBody").val()},
+            success: function() {
+              $("#webhookTestBtn_help").text("提交模拟测试成功, 如修改记得保存配置")
+              setTimeout(function(){
+                $("#webhookTestBtn_help").text("")
+              }, 5000)
+            },
+            error: function(jqXHR) {
+              alert(jqXHR.statusText);
+            }
+          })
+      })
+    })
+  </script>
+
+</html>

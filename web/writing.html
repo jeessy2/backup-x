@@ -30,6 +30,7 @@
         <form>
 
           <button class="btn btn-primary submit_btn" style="margin-bottom: 15px;">Save</button>
+          <button class="btn btn-warning submit_btn_backupNow" style="margin-bottom: 15px;margin-left: 15px;">Save & Backup Now</button>
 
           <div class="alert alert-success" style="display: none;">
             <strong id="resultMsg">保存成功</strong>
@@ -224,7 +225,7 @@
           </div>
 
           <button class="btn btn-primary submit_btn" style="margin-bottom: 15px;">Save</button>
-
+          <button class="btn btn-warning submit_btn_backupNow" style="margin-bottom: 15px;margin-left: 15px;">Save & Backup Now</button>
         </form>
       </div>
 
@@ -238,12 +239,12 @@
   <script>
 
     $(function(){
-      $(".submit_btn").on('click',function(e) {
+      $(".submit_btn,.submit_btn_run").on('click',function(e) {
         e.preventDefault();
         $('body').animate({ scrollTop: 0 }, 300);
         $.ajax({
           method: "POST",
-          url: "/save",
+          url: "/save?backupNow=" + e.target.classList.contains("submit_btn_backupNow"),
           data: $('form').serialize(),
           success: function (result) {
             $('.alert').css("display", "block");

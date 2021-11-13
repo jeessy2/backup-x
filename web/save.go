@@ -49,7 +49,9 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	// 没有错误
 	if err == nil {
 		conf.CreateBucketIfNotExist()
-		go client.RunOnce()
+		if request.URL.Query().Get("backupNow") == "true" {
+			go client.RunOnce()
+		}
 		// 重新进行循环
 		client.StopRunLoop()
 		go client.RunLoop()

@@ -44,7 +44,7 @@ func RunLoop() {
 		}
 
 		delay := util.GetDelaySeconds(backupConf.StartTime)
-		ticker := time.NewTicker(time.Second)
+		ticker := time.NewTicker(delay)
 		log.Printf("%s项目将在%.1f小时后运行\n", backupConf.ProjectName, delay.Hours())
 
 		bl.Wg.Add(1)
@@ -144,9 +144,9 @@ func backup(backupConf entity.BackupConfig) (outFileName os.FileInfo, err error)
 	shell.Dir = backupConf.GetProjectPath()
 	outputBytes, err := shell.CombinedOutput()
 	if len(outputBytes) > 0 {
-		log.Printf("<span title=\"%s\">执行shell的输出：鼠标移动此处查看</span>", util.EscapeShell(string(outputBytes)))
+		log.Printf("<span title=\"%s\">%s 执行shell的输出：鼠标移动此处查看</span>\n", util.EscapeShell(string(outputBytes)), backupConf.ProjectName)
 	} else {
-		log.Printf("执行shell的输出为空")
+		log.Printf("执行shell的输出为空\n")
 	}
 
 	// execute shell success

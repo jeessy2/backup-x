@@ -1,6 +1,6 @@
 # backup-x
 
-<a href="https://github.com/jeessy2/backup-x/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/release/jeessy2/backup.svg?logo=github&style=flat-square"></a> <img src=https://goreportcard.com/badge/github.com/jeessy2/backup-x /> <img src=https://img.shields.io/docker/image-size/jeessy/backup-x /> <img src=https://img.shields.io/docker/pulls/jeessy/backup-x /> 
+<a href="https://github.com/jeessy2/backup-x/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/release/jeessy2/backup-x.svg?logo=github&style=flat-square"></a> <img src=https://goreportcard.com/badge/github.com/jeessy2/backup-x /> <img src=https://img.shields.io/docker/image-size/jeessy/backup-x /> <img src=https://img.shields.io/docker/pulls/jeessy/backup-x /> 
 
   带Web界面的数据库/文件备份增强工具。原理：执行自定义shell命令输出文件，增强备份功能。同时支持: 文件、mysql、postgres... [English](README-EN.md)
   - [x] 支持自定义命令

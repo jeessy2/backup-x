@@ -1,10 +1,12 @@
-<a href="https://github.com/jeessy2/backup-x/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/release/jeessy2/backup-x.svg?logo=github&style=flat-square"></a>
 # backup-x
-  原理：执行自定义shell命令输出文件，并增强备份功能。支持能通过shell命令的备份的数据库(mysql/postgres/mariadb...), 同时也支持通过shell打包 [English](README-EN.md)
+
+<a href="https://github.com/jeessy2/backup-x/releases/latest"><img alt="GitHub release" src="https://img.shields.io/github/release/jeessy2/backup.svg?logo=github&style=flat-square"></a> <img src=https://goreportcard.com/badge/github.com/jeessy2/backup-x /> <img src=https://img.shields.io/docker/image-size/jeessy/backup-x /> <img src=https://img.shields.io/docker/pulls/jeessy/backup-x /> 
+
+  带Web界面的数据库/文件备份增强工具。原理：执行自定义shell命令输出文件，增强备份功能。同时支持: 文件、mysql、postgres... [English](README-EN.md)
   - [x] 支持自定义命令
   - [x] 网页中配置，简单又方便
   - [x] 支持多个项目备份，最多16个
-  - [x] 支持备份后的文件另存到对象存储(在也怕硬盘坏了)
+  - [x] 支持备份后的文件另存到对象存储中 (在也怕删库跑路了)
   - [x] 每日凌晨自动备份
   - [x] 可设置备份文件最大保存天数
   - [x] 可设置登陆用户名密码，默认为空
@@ -13,16 +15,17 @@
 ## docker中使用
 - 运行docker容器
   ```
-  docker run -d \
-    --name backup-x \
-    --restart=always \
-    -p 9977:9977 \
-    -v /opt/backup-x-files:/app/backup-x-files \
-    jeessy/backup-x
+  docker run -d --name backup-x --restart=always -p 9977:9977 \
+  -v /opt/backup-x-files:/app/backup-x-files \
+  jeessy/backup-x
   ```
 - 登录 http://your_docker_ip:9977 并配置
-  ![avatar](https://raw.githubusercontent.com/jeessy2/backup-x/master/backup-x-web.png)
 
+## 系统中使用
+- 下载并解压[https://github.com/jeessy2/backup-x/releases](https://github.com/jeessy2/backup-x/releases)
+- 登录 http://127.0.0.1:9977 并配置
+
+  ![avatar](https://raw.githubusercontent.com/jeessy2/backup-x/master/backup-x-web.png)
 
 ## 备份脚本参考
  - postgres
@@ -40,6 +43,13 @@
     | 备份单个  | mysqldump -h192.168.1.11 -uroot -p123456 db-name > #{DATE}.sql |
     | 备份全部  | mysqldump -h192.168.1.11 -uroot -p123456 --all-databases > #{DATE}.sql |
     | 还原  | mysql -uroot -p123456 db-name <2021-11-12_10_29.sql |
+
+ -  文件
+
+    |  说明   | 备份脚本  |
+    |  ----  | ----  |
+    | tar压缩备份 | tar -zcvf #{DATE}.tar.gz /home/projects |
+    | 还原 | tar -zxvf 2021-11-12_10_29.tar.gz |
 
 ## webhook
 - 支持webhook, 备份更新成功或不成功时, 会回调填写的URL

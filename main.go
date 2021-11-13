@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backup-x/client"
 	"backup-x/web"
 	"embed"
 	"os"
@@ -29,7 +30,8 @@ func main() {
 	http.HandleFunc("/webhookTest", web.BasicAuth(web.WebhookTest))
 
 	// 运行
-	go web.Run()
+	go client.DeleteOldBackup()
+	go client.RunLoop()
 
 	if os.Getenv("port") != "" {
 		defaultPort = os.Getenv("port")

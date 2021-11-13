@@ -11,15 +11,65 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
-// StartBackup start backup db
-func StartBackup() {
-	for {
-		RunOnce()
-		// sleep to tomorrow night
-		sleep()
+// backupLooper
+type backupLooper struct {
+	Wg      sync.WaitGroup
+	Tickers []*time.Ticker
+}
+
+var bl = &backupLooper{Wg: sync.WaitGroup{}}
+
+// RunLoop backup db loop
+func RunLoop() {
+	conf, err := entity.GetConfigCache()
+	if err != nil {
+		return
+	}
+
+	// clear
+	bl.Tickers = []*time.Ticker{}
+
+	for _, backupConf := range conf.BackupConfig {
+		if !backupConf.NotEmptyProject() {
+			continue
+		}
+
+		if !backupConf.CheckPeriod() {
+			log.Println(backupConf.ProjectName + "的周期值不正确")
+			continue
+		}
+
+		delay := util.GetDelaySeconds(backupConf.StartTime)
+		ticker := time.NewTicker(time.Second)
+		log.Printf("%s项目将在%.1f小时后运行\n", backupConf.ProjectName, delay.Hours())
+
+		bl.Wg.Add(1)
+		go func(backupConf entity.BackupConfig) {
+			defer bl.Wg.Done()
+			for {
+				<-ticker.C
+				run(conf, backupConf)
+				ticker.Reset(time.Minute * time.Duration(backupConf.Period))
+				log.Printf("%s项目将等待%d分钟后循环运行\n", backupConf.ProjectName, backupConf.Period)
+			}
+		}(backupConf)
+		bl.Tickers = append(bl.Tickers, ticker)
+	}
+
+	bl.Wg.Wait()
+
+}
+
+// StopRunLoop
+func StopRunLoop() {
+	for _, ticker := range bl.Tickers {
+		if ticker != nil {
+			ticker.Stop()
+		}
 	}
 }
 
@@ -29,27 +79,32 @@ func RunOnce() {
 	if err != nil {
 		return
 	}
-	// 迭代所有项目
+
 	for _, backupConf := range conf.BackupConfig {
-		if backupConf.NotEmptyProject() {
-			err := prepare(backupConf)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			// backup
-			outFileName, err := backup(backupConf)
-			result := entity.BackupResult{ProjectName: backupConf.ProjectName, Result: "失败"}
-			if err == nil {
-				// webhook
-				result.FileName = outFileName.Name()
-				result.FileSize = fmt.Sprintf("%d MB", outFileName.Size()/1000/1000)
-				result.Result = "成功"
-				// send file to s3
-				go conf.UploadFile(backupConf.GetProjectPath() + string(os.PathSeparator) + outFileName.Name())
-			}
-			conf.ExecWebhook(result)
+		run(conf, backupConf)
+	}
+}
+
+// run
+func run(conf entity.Config, backupConf entity.BackupConfig) {
+	if backupConf.NotEmptyProject() {
+		err := prepare(backupConf)
+		if err != nil {
+			log.Println(err)
+			return
 		}
+		// backup
+		outFileName, err := backup(backupConf)
+		result := entity.BackupResult{ProjectName: backupConf.ProjectName, Result: "失败"}
+		if err == nil {
+			// webhook
+			result.FileName = outFileName.Name()
+			result.FileSize = fmt.Sprintf("%d MB", outFileName.Size()/1000/1000)
+			result.Result = "成功"
+			// send file to s3
+			go conf.UploadFile(backupConf.GetProjectPath() + string(os.PathSeparator) + outFileName.Name())
+		}
+		conf.ExecWebhook(result)
 	}
 }
 
@@ -69,11 +124,11 @@ func backup(backupConf entity.BackupConfig) (outFileName os.FileInfo, err error)
 	projectName := backupConf.ProjectName
 	log.Printf("正在备份项目: %s ...", projectName)
 
-	todayString := time.Now().Format("2006-01-02_03_04")
+	todayString := time.Now().Format("2006-01-02_15_04")
 	shellString := strings.ReplaceAll(backupConf.Command, "#{DATE}", todayString)
 
 	// create shell file
-	shellName := time.Now().Format("shell-2006-01-02-03-04-") + "backup.sh"
+	shellName := time.Now().Format("shell-2006-01-02-15-04-") + "backup.sh"
 
 	shellFile, err := os.Create(backupConf.GetProjectPath() + string(os.PathSeparator) + shellName)
 	shellFile.Chmod(0700)
@@ -129,10 +184,4 @@ func findBackupFile(backupConf entity.BackupConfig, todayString string) (backupF
 	}
 	err = errors.New("不能找到备份后的文件，没有找到包含 " + todayString + " 的文件名")
 	return
-}
-
-func sleep() {
-	sleepHours := 24 - time.Now().Hour()
-	log.Println("下次运行时间：", sleepHours, "hours")
-	time.Sleep(time.Hour * time.Duration(sleepHours))
 }

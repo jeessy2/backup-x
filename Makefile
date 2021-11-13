@@ -18,7 +18,7 @@ build_image:
 	@$(DOCKER_CMD) build -f ./Dockerfile -t backup-x:$(VERSION) .
 
 test:
-	@$(GO) test ./...
+	@$(GO) test ./... -v
 
 test-race:
 	@$(GO) test -race ./...

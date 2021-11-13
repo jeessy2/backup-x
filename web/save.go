@@ -1,6 +1,7 @@
 package web
 
 import (
+	"backup-x/client"
 	"backup-x/entity"
 	"net/http"
 	"strconv"
@@ -18,12 +19,16 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	forms := request.PostForm
 	for index, projectName := range forms["ProjectName"] {
 		saveDays, _ := strconv.Atoi(forms["SaveDays"][index])
+		startTime, _ := strconv.Atoi(forms["StartTime"][index])
+		period, _ := strconv.Atoi(forms["Period"][index])
 		conf.BackupConfig = append(
 			conf.BackupConfig,
 			entity.BackupConfig{
 				ProjectName: projectName,
 				Command:     forms["Command"][index],
 				SaveDays:    saveDays,
+				StartTime:   startTime,
+				Period:      period,
 			},
 		)
 	}
@@ -41,10 +46,13 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	// 保存到用户目录
 	err := conf.SaveConfig()
 
-	// 没有错误，运行一次
+	// 没有错误
 	if err == nil {
 		conf.CreateBucketIfNotExist()
-		go RunOnce()
+		go client.RunOnce()
+		// 重新进行循环
+		client.StopRunLoop()
+		go client.RunLoop()
 	}
 
 	// 回写错误信息

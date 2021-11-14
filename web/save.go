@@ -3,6 +3,7 @@ package web
 import (
 	"backup-x/client"
 	"backup-x/entity"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,6 +16,10 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	// 覆盖以前的配置
 	conf.Username = strings.TrimSpace(request.FormValue("Username"))
 	conf.Password = request.FormValue("Password")
+
+	if conf.Username == "" || conf.Password == "" {
+		log.Printf("<span style='color:red'>%s</span>\n", "建议设置登录用户名/密码")
+	}
 
 	forms := request.PostForm
 	for index, projectName := range forms["ProjectName"] {

@@ -7,10 +7,17 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // ViewFunc func
 type ViewFunc func(http.ResponseWriter, *http.Request)
+
+type loginDetect struct {
+	FailTimes int
+}
+
+var ld = &loginDetect{}
 
 // BasicAuth basic auth
 func BasicAuth(f ViewFunc) ViewFunc {
@@ -40,10 +47,18 @@ func BasicAuth(f ViewFunc) ViewFunc {
 				if len(pair) == 2 &&
 					bytes.Equal(pair[0], []byte(conf.Username)) &&
 					bytes.Equal(pair[1], []byte(conf.Password)) {
+					ld.FailTimes = 0
 					// 执行被装饰的函数
 					f(w, r)
 					return
 				}
+			}
+
+			ld.FailTimes = ld.FailTimes + 1
+			if ld.FailTimes > 5 {
+				log.Printf("%s 登陆失败超过5次! 并延时60s响应\n", r.RemoteAddr)
+				time.Sleep(60 * time.Second)
+				ld.FailTimes = 0
 			}
 			log.Printf("%s 登陆失败!\n", r.RemoteAddr)
 		}

@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -128,7 +129,12 @@ func backup(backupConf entity.BackupConfig) (outFileName os.FileInfo, err error)
 	shellString := strings.ReplaceAll(backupConf.Command, "#{DATE}", todayString)
 
 	// create shell file
-	shellName := time.Now().Format("shell-2006-01-02-15-04-") + "backup.sh"
+	var shellName string
+	if runtime.GOOS == "windows" {
+		shellName = time.Now().Format("shell-2006-01-02-15-04-") + "backup.bat"
+	} else {
+		shellName = time.Now().Format("shell-2006-01-02-15-04-") + "backup.sh"
+	}
 
 	shellFile, err := os.Create(backupConf.GetProjectPath() + string(os.PathSeparator) + shellName)
 	shellFile.Chmod(0700)
@@ -140,7 +146,12 @@ func backup(backupConf entity.BackupConfig) (outFileName os.FileInfo, err error)
 	}
 
 	// run shell file
-	shell := exec.Command("bash", shellName)
+	var shell *exec.Cmd
+	if runtime.GOOS == "windows" {
+		shell = exec.Command("cmd", "/c", shellName)
+	} else {
+		shell = exec.Command("bash", shellName)
+	}
 	shell.Dir = backupConf.GetProjectPath()
 	outputBytes, err := shell.CombinedOutput()
 	if len(outputBytes) > 0 {

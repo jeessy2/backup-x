@@ -16,6 +16,11 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	conf.Username = strings.TrimSpace(request.FormValue("Username"))
 	conf.Password = request.FormValue("Password")
 
+	if conf.Username == "" || conf.Password == "" {
+		writer.Write([]byte("请输入登录用户名/密码"))
+		return
+	}
+
 	forms := request.PostForm
 	for index, projectName := range forms["ProjectName"] {
 		saveDays, _ := strconv.Atoi(forms["SaveDays"][index])

@@ -13,14 +13,16 @@ FROM debian:stable-slim
 LABEL name=backup-x
 LABEL url=https://github.com/jeessy2/backup-x
 
-VOLUME /app/backup-x-files
-
-WORKDIR /app
 RUN apt-get -y update  \
     && apt-get install -y ca-certificates curl  \
     && apt-get install -y postgresql-client \
     && apt-get install -y default-mysql-client
 
+RUN useradd -s /bin/bash appuser
+USER appuser
+WORKDIR /app
+
+VOLUME /app/backup-x-files
 ENV TZ=Asia/Shanghai
 COPY --from=builder /app/backup-x /app/backup-x
 EXPOSE 9977

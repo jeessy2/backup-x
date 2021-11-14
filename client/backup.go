@@ -157,12 +157,12 @@ func backup(backupConf entity.BackupConfig) (outFileName os.FileInfo, err error)
 		// check file size
 		if err != nil {
 			log.Println(err)
-		} else if outFileName.Size() >= 500 {
+		} else if outFileName.Size() >= 200 {
 			log.Printf("成功备份项目: %s, 文件名: %s\n", projectName, outFileName.Name())
 			// success, remove shell file
 			os.Remove(shellFile.Name())
 		} else {
-			err = errors.New(projectName + " 备份后的文件大小小于500字节, 当前大小：" + strconv.Itoa(int(outFileName.Size())))
+			err = errors.New(projectName + " 备份后的文件大小小于200字节, 当前大小：" + strconv.Itoa(int(outFileName.Size())))
 			log.Println(err)
 		}
 	} else {

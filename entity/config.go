@@ -9,15 +9,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// ParentSavePath Parent Save Path
-const ParentSavePath = "backup-x-files"
-
-func init() {
-	_, err := os.Stat(ParentSavePath)
-	if err != nil {
-		os.Mkdir(ParentSavePath, 0750)
-	}
-}
+// parentSavePath Parent Save Path
+const parentSavePath = "backup-x-files"
 
 // Config yml格式的配置文件
 // go的实体需大写对应config.yml的key, key全部小写
@@ -101,5 +94,9 @@ func (conf *Config) SaveConfig() (err error) {
 
 // GetConfigFilePath 获得配置文件路径, 保存到备份目录下
 func getConfigFilePath() string {
-	return ParentSavePath + string(os.PathSeparator) + ".backup_x_config.yaml"
+	_, err := os.Stat(parentSavePath)
+	if err != nil {
+		os.Mkdir(parentSavePath, 0750)
+	}
+	return parentSavePath + string(os.PathSeparator) + ".backup_x_config.yaml"
 }

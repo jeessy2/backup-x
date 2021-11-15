@@ -9,15 +9,15 @@
   - [x] 支持多个项目备份，最多16个
   - [x] 支持备份后的文件另存到对象存储中 (在也怕删库跑路了)
   - [x] 可设置备份文件最大保存天数
-  - [x] 可设置登陆用户名密码，默认为空
   - [x] webhook通知
 
 ## docker中使用
-- 运行docker容器
+- 运行docker容器（`/opt/backup-x-files`可替换为主机的目录）
   ```
-  docker run -d --name backup-x --restart=always -p 9977:9977 \
-  -v /opt/backup-x-files:/app/backup-x-files \
-  jeessy/backup-x
+  docker run -d --name backup-x --restart=always \
+    -p 9977:9977 \
+    -v /opt/backup-x-files:/app/backup-x-files \
+    jeessy/backup-x
   ```
 - 登录 http://your_docker_ip:9977 并配置
 

@@ -27,6 +27,7 @@ func main() {
 	http.HandleFunc("/", web.BasicAuth(web.WritingConfig))
 	http.HandleFunc("/save", web.BasicAuth(web.Save))
 	http.HandleFunc("/logs", web.BasicAuth(web.Logs))
+	http.HandleFunc("/clearLog", web.BasicAuth(web.ClearLog))
 	http.HandleFunc("/webhookTest", web.BasicAuth(web.WebhookTest))
 
 	// 运行

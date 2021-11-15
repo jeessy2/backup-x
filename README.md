@@ -11,7 +11,6 @@
   - [x] 可设置备份文件最大保存天数
   - [x] 可设置登陆用户名密码，默认为空
   - [x] webhook通知
-  - [x] 网页中配置，简单又方便
 
 ## docker中使用
 - 运行docker容器
@@ -24,6 +23,15 @@
 
 ## 系统中使用
 - 下载并解压[https://github.com/jeessy2/backup-x/releases](https://github.com/jeessy2/backup-x/releases)
+- 安装服务
+  - Mac/Linux: `./backup-x -s install` 
+  - Win(打开cmd): `.\backup-x.exe -s install`
+  - 自定义参数 `./backup-x -s install -l 127.0.0.1:9977 -d /Users/name`
+    - `-l` 监听地址（默认监听`:9977`）
+    - `-d` 自定义备份目录地址（默认当前运行目录）
+- [可选] 服务卸载
+  - Mac/Linux: `./backup-x -s uninstall` 
+  - Win(打开cmd): `.\backup-x.exe -s uninstall`
 - 登录 http://127.0.0.1:9977 并配置
 
   ![avatar](https://raw.githubusercontent.com/jeessy2/backup-x/master/backup-x-web.png)

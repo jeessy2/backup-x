@@ -20,6 +20,7 @@
     jeessy/backup-x
   ```
 - 登录 http://your_docker_ip:9977 并配置
+- docker容器默认安装default-mysql-client/postgres-client
 
 ## 系统中使用
 - 下载并解压[https://github.com/jeessy2/backup-x/releases](https://github.com/jeessy2/backup-x/releases)

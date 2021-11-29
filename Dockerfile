@@ -19,6 +19,8 @@ RUN apt-get -y update  \
     && apt-get install -y default-mysql-client
 
 RUN useradd -s /bin/bash appuser
+RUN mkdir -p /app/backup-x-files \ 
+    && chown -R appuser:root /app/backup-x-files
 USER appuser
 WORKDIR /app
 

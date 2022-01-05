@@ -2,6 +2,7 @@ package web
 
 import (
 	"backup-x/entity"
+	"backup-x/util"
 	"bytes"
 	"encoding/base64"
 	"log"
@@ -44,9 +45,10 @@ func BasicAuth(f ViewFunc) ViewFunc {
 			)
 			if err == nil {
 				pair := bytes.SplitN(payload, []byte(":"), 2)
+				pwd, _ := util.DecryptByEncryptKey(conf.EncryptKey, conf.Password)
 				if len(pair) == 2 &&
 					bytes.Equal(pair[0], []byte(conf.Username)) &&
-					bytes.Equal(pair[1], []byte(conf.Password)) {
+					bytes.Equal(pair[1], []byte(pwd)) {
 					ld.FailTimes = 0
 					// 执行被装饰的函数
 					f(w, r)

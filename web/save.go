@@ -54,8 +54,21 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 				SaveDays:    saveDays,
 				StartTime:   startTime,
 				Period:      period,
+				Pwd:         forms["Pwd"][index],
 			},
 		)
+	}
+
+	for i := 0; i < len(conf.BackupConfig); i++ {
+		if conf.BackupConfig[i].Pwd != "" &&
+			(len(oldConf.BackupConfig) == 0 || conf.BackupConfig[i].Pwd != oldConf.BackupConfig[i].Pwd) {
+			encryptPwd, err := util.EncryptByEncryptKey(conf.EncryptKey, conf.BackupConfig[i].Pwd)
+			if err != nil {
+				writer.Write([]byte("加密失败"))
+				return
+			}
+			conf.BackupConfig[i].Pwd = encryptPwd
+		}
 	}
 
 	// Webhook
@@ -68,7 +81,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	conf.SecretKey = strings.TrimSpace(request.FormValue("SecretKey"))
 	conf.BucketName = strings.TrimSpace(request.FormValue("BucketName"))
 
-	if conf.SecretKey != oldConf.SecretKey {
+	if conf.SecretKey != "" && conf.SecretKey != oldConf.SecretKey {
 		secretKey, err := util.EncryptByEncryptKey(conf.EncryptKey, conf.SecretKey)
 		if err != nil {
 			writer.Write([]byte("加密失败"))

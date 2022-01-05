@@ -95,7 +95,7 @@ func run(conf entity.Config, backupConf entity.BackupConfig) {
 			return
 		}
 		// backup
-		outFileName, err := backup(backupConf)
+		outFileName, err := backup(backupConf, conf.EncryptKey)
 		result := entity.BackupResult{ProjectName: backupConf.ProjectName, Result: "失败"}
 		if err == nil {
 			// webhook
@@ -121,12 +121,25 @@ func prepare(backupConf entity.BackupConfig) (err error) {
 	return
 }
 
-func backup(backupConf entity.BackupConfig) (outFileName os.FileInfo, err error) {
+func backup(backupConf entity.BackupConfig, encryptKey string) (outFileName os.FileInfo, err error) {
 	projectName := backupConf.ProjectName
 	log.Printf("正在备份项目: %s ...", projectName)
 
 	todayString := time.Now().Format("2006-01-02_15_04")
 	shellString := strings.ReplaceAll(backupConf.Command, "#{DATE}", todayString)
+
+	// 解密pwd
+	pwd := ""
+	if backupConf.Pwd != "" {
+		pwd, err = util.DecryptByEncryptKey(encryptKey, backupConf.Pwd)
+		if err != nil {
+			err = fmt.Errorf("解密失败")
+			log.Println(err)
+			return nil, err
+		}
+	}
+
+	shellString = strings.ReplaceAll(shellString, "#{PWD}", pwd)
 
 	// create shell file
 	var shellName string

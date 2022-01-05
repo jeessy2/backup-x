@@ -21,6 +21,8 @@ type S3Config struct {
 	BucketName string
 }
 
+var ErrS3Empty = errors.New("s3 config is empty")
+
 func (s3Config S3Config) checkNotEmpty() bool {
 	return s3Config.Endpoint != "" && s3Config.AccessKey != "" &&
 		s3Config.SecretKey != "" && s3Config.BucketName != ""
@@ -29,7 +31,7 @@ func (s3Config S3Config) checkNotEmpty() bool {
 func (s3Config S3Config) getSession() (*session.Session, error) {
 
 	if !s3Config.checkNotEmpty() {
-		return nil, errors.New("s3 config is empty")
+		return nil, ErrS3Empty
 	}
 
 	conf, err := GetConfigCache()
@@ -62,6 +64,9 @@ func (s3Config S3Config) getSession() (*session.Session, error) {
 func (s3Config S3Config) CreateBucketIfNotExist() {
 	mySession, err := s3Config.getSession()
 	if err != nil {
+		if err != ErrS3Empty {
+			log.Printf("创建对象存储会话失败, ERR: %s\n", err)
+		}
 		return
 	}
 	client := s3.New(mySession)
@@ -87,7 +92,9 @@ func (s3Config S3Config) CreateBucketIfNotExist() {
 func (s3Config S3Config) UploadFile(fileName string) {
 	mySession, err := s3Config.getSession()
 	if err != nil {
-		log.Printf("创建对象存储会话失败, ERR: %s\n", err)
+		if err != ErrS3Empty {
+			log.Printf("创建对象存储会话失败, ERR: %s\n", err)
+		}
 		return
 	}
 

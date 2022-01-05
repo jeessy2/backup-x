@@ -10,6 +10,7 @@
   - [x] 支持备份后的文件另存到对象存储中 (在也不怕删库跑路了)
   - [x] 可设置备份文件最大保存天数
   - [x] webhook通知
+  - [x] 支持加密关键信息(v1.3.0+)
 
 ## docker中使用
 - 运行docker容器（`/opt/backup-x-files`可替换为主机的目录）
@@ -42,16 +43,16 @@
 
     |  说明   | 备份脚本  |
     |  ----  | ----  |
-    | 备份单个  | PGPASSWORD="password" pg_dump --host 192.168.1.11 --port 5432 --dbname db-name --user postgres --clean --create --file #{DATE}.sql |
-    | 备份全部  | PGPASSWORD="password" pg_dumpall --host 192.168.1.11 --port 5432 --user postgres --clean --file #{DATE}.sql |
+    | 备份单个  | PGPASSWORD="#{PWD}" pg_dump --host 192.168.1.11 --port 5432 --dbname db-name --user postgres --clean --create --file #{DATE}.sql |
+    | 备份全部  | PGPASSWORD="#{PWD}" pg_dumpall --host 192.168.1.11 --port 5432 --user postgres --clean --file #{DATE}.sql |
     | 还原  | psql -U postgres -f 2021-11-12_10_29.sql |
 
  -  mysql/mariadb
 
     |  说明   | 备份脚本  |
     |  ----  | ----  |
-    | 备份单个  | mysqldump -h192.168.1.11 -uroot -p123456 db-name > #{DATE}.sql |
-    | 备份全部  | mysqldump -h192.168.1.11 -uroot -p123456 --all-databases > #{DATE}.sql |
+    | 备份单个  | mysqldump -h192.168.1.11 -uroot -p#{PWD} db-name > #{DATE}.sql |
+    | 备份全部  | mysqldump -h192.168.1.11 -uroot -p#{PWD} --all-databases > #{DATE}.sql |
     | 还原  | mysql -uroot -p123456 db-name <2021-11-12_10_29.sql |
 
  -  文件

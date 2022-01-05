@@ -3,6 +3,7 @@ package web
 import (
 	"backup-x/client"
 	"backup-x/entity"
+	"backup-x/util"
 	"net/http"
 	"strconv"
 	"strings"
@@ -10,7 +11,18 @@ import (
 
 // Save 保存
 func Save(writer http.ResponseWriter, request *http.Request) {
+	oldConf, _ := entity.GetConfigCache()
 	conf := &entity.Config{}
+
+	conf.EncryptKey = oldConf.EncryptKey
+	if conf.EncryptKey == "" {
+		encryptKey, err := util.GenerateEncryptKey()
+		if err != nil {
+			writer.Write([]byte("生成Key失败"))
+			return
+		}
+		conf.EncryptKey = encryptKey
+	}
 
 	// 覆盖以前的配置
 	conf.Username = strings.TrimSpace(request.FormValue("Username"))
@@ -19,6 +31,14 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	if conf.Username == "" || conf.Password == "" {
 		writer.Write([]byte("请输入登录用户名/密码"))
 		return
+	}
+	if conf.Password != oldConf.Password {
+		encryptPasswd, err := util.EncryptByEncryptKey(conf.EncryptKey, conf.Password)
+		if err != nil {
+			writer.Write([]byte("加密失败"))
+			return
+		}
+		conf.Password = encryptPasswd
 	}
 
 	forms := request.PostForm
@@ -47,6 +67,15 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	conf.AccessKey = strings.TrimSpace(request.FormValue("AccessKey"))
 	conf.SecretKey = strings.TrimSpace(request.FormValue("SecretKey"))
 	conf.BucketName = strings.TrimSpace(request.FormValue("BucketName"))
+
+	if conf.SecretKey != oldConf.SecretKey {
+		secretKey, err := util.EncryptByEncryptKey(conf.EncryptKey, conf.SecretKey)
+		if err != nil {
+			writer.Write([]byte("加密失败"))
+			return
+		}
+		conf.SecretKey = secretKey
+	}
 
 	// 保存到用户目录
 	err := conf.SaveConfig()

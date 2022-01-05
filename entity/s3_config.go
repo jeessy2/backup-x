@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"backup-x/util"
 	"errors"
 	"log"
 	"os"
@@ -31,8 +32,17 @@ func (s3Config S3Config) getSession() (*session.Session, error) {
 		return nil, errors.New("s3 config is empty")
 	}
 
-	creds := credentials.NewStaticCredentials(s3Config.AccessKey, s3Config.SecretKey, "")
-	_, err := creds.Get()
+	conf, err := GetConfigCache()
+	if err != nil {
+		return nil, err
+	}
+	secretKey, err := util.DecryptByEncryptKey(conf.EncryptKey, s3Config.SecretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	creds := credentials.NewStaticCredentials(s3Config.AccessKey, secretKey, "")
+	_, err = creds.Get()
 	if err != nil {
 		log.Println(err)
 	}
@@ -77,6 +87,7 @@ func (s3Config S3Config) CreateBucketIfNotExist() {
 func (s3Config S3Config) UploadFile(fileName string) {
 	mySession, err := s3Config.getSession()
 	if err != nil {
+		log.Printf("创建对象存储会话失败, ERR: %s\n", err)
 		return
 	}
 

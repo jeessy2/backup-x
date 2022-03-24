@@ -18,6 +18,8 @@ builds:
       - amd64
       - arm
       - arm64
+    ldflags:
+      - -s -w -X main.version={{.Tag}} -X main.buildTime={{.Date}}
 archives:
   - replacements:
       darwin: Darwin

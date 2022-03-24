@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . .
 RUN go env -w GO111MODULE=on \
     && go env -w GOPROXY=https://goproxy.cn,direct \
-    && make clean build
+    && make clean test build
 
 # final stage
 FROM debian:stable-slim

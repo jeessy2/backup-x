@@ -1,6 +1,6 @@
 .PHONY: build clean test test-race
 
-VERSION=v2.0.0
+VERSION=$(shell git describe --tags `git rev-list --tags --max-count=1`)
 BIN=backup-x
 DIR_SRC=.
 DOCKER_CMD=docker
@@ -14,7 +14,7 @@ GOPATH=$(shell `which go` env GOPATH)
 build: $(DIR_SRC)/main.go
 	@$(GO) build $(GO_FLAGS) -o $(BIN) $(DIR_SRC)
 
-build_image:
+build_docker_image:
 	@$(DOCKER_CMD) build -f ./Dockerfile -t backup-x:$(VERSION) .
 
 test:

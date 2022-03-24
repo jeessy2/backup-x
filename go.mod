@@ -3,12 +3,12 @@ module backup-x
 go 1.17
 
 require (
-	github.com/aws/aws-sdk-go v1.42.27
-	github.com/kardianos/service v1.2.0
+	github.com/aws/aws-sdk-go v1.43.24
+	github.com/kardianos/service v1.2.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 )

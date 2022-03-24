@@ -6,10 +6,18 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 )
 
 //go:embed writing.html
 var writingEmbedFile embed.FS
+
+const VersionEnv = "BACKUP_X_VERSION"
+
+type writtingData struct {
+	entity.Config
+	Version string
+}
 
 // WritingConfig 填写配置信息
 func WritingConfig(writer http.ResponseWriter, request *http.Request) {
@@ -21,7 +29,7 @@ func WritingConfig(writer http.ResponseWriter, request *http.Request) {
 
 	conf, err := entity.GetConfigCache()
 	if err == nil {
-		tmpl.Execute(writer, conf)
+		tmpl.Execute(writer, &writtingData{Config: conf, Version: os.Getenv(VersionEnv)})
 		return
 	}
 
@@ -35,5 +43,5 @@ func WritingConfig(writer http.ResponseWriter, request *http.Request) {
 		BackupConfig: backupConf,
 	}
 
-	tmpl.Execute(writer, conf)
+	tmpl.Execute(writer, &writtingData{Config: conf, Version: os.Getenv(VersionEnv)})
 }

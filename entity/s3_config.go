@@ -23,14 +23,14 @@ type S3Config struct {
 
 var ErrS3Empty = errors.New("s3 config is empty")
 
-func (s3Config S3Config) checkNotEmpty() bool {
+func (s3Config S3Config) CheckNotEmpty() bool {
 	return s3Config.Endpoint != "" && s3Config.AccessKey != "" &&
 		s3Config.SecretKey != "" && s3Config.BucketName != ""
 }
 
 func (s3Config S3Config) getSession() (*session.Session, error) {
 
-	if !s3Config.checkNotEmpty() {
+	if !s3Config.CheckNotEmpty() {
 		return nil, ErrS3Empty
 	}
 
@@ -89,6 +89,7 @@ func (s3Config S3Config) CreateBucketIfNotExist() {
 	}
 }
 
+// UploadFile 上传
 func (s3Config S3Config) UploadFile(fileName string) {
 	mySession, err := s3Config.getSession()
 	if err != nil {
@@ -116,4 +117,53 @@ func (s3Config S3Config) UploadFile(fileName string) {
 	} else {
 		log.Printf("%s 上传到对象存储成功\n", fileName)
 	}
+}
+
+// ListFiles 列出文件
+func (s3Config S3Config) ListFiles(projectPath string) (fileNames []string, err error) {
+	mySession, err := s3Config.getSession()
+	if err != nil {
+		if err != ErrS3Empty {
+			log.Printf("创建对象存储会话失败, ERR: %s\n", err)
+		}
+		return nil, err
+	}
+
+	svc := s3.New(mySession)
+	params := &s3.ListObjectsInput{
+		Bucket: aws.String(s3Config.BucketName),
+		Prefix: aws.String(projectPath),
+	}
+	resp, err := svc.ListObjects(params)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, item := range resp.Contents {
+		fileNames = append(fileNames, *item.Key)
+	}
+
+	return fileNames, err
+}
+
+// DeleteFile 删除文件
+func (s3Config S3Config) DeleteFile(filePath string) error {
+	mySession, err := s3Config.getSession()
+	if err != nil {
+		if err != ErrS3Empty {
+			log.Printf("创建对象存储会话失败, ERR: %s\n", err)
+		}
+		return err
+	}
+
+	svc := s3.New(mySession)
+	_, err = svc.DeleteObject(&s3.DeleteObjectInput{Bucket: aws.String(s3Config.BucketName), Key: aws.String(filePath)})
+	if err != nil {
+		return err
+	}
+
+	return svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+		Bucket: aws.String(s3Config.BucketName),
+		Key:    aws.String(filePath),
+	})
 }

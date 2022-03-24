@@ -103,7 +103,9 @@ func run(conf entity.Config, backupConf entity.BackupConfig) {
 			result.FileSize = fmt.Sprintf("%d MB", outFileName.Size()/1000/1000)
 			result.Result = "成功"
 			// send file to s3
-			go conf.UploadFile(backupConf.GetProjectPath() + string(os.PathSeparator) + outFileName.Name())
+			if conf.S3Config.CheckNotEmpty() {
+				go conf.S3Config.UploadFile(backupConf.GetProjectPath() + string(os.PathSeparator) + outFileName.Name())
+			}
 		}
 		conf.ExecWebhook(result)
 	}
@@ -125,7 +127,7 @@ func backup(backupConf entity.BackupConfig, encryptKey string) (outFileName os.F
 	projectName := backupConf.ProjectName
 	log.Printf("正在备份项目: %s ...", projectName)
 
-	todayString := time.Now().Format("2006-01-02_15_04")
+	todayString := time.Now().Format(util.FileNameFormatStr)
 	shellString := strings.ReplaceAll(backupConf.Command, "#{DATE}", todayString)
 
 	// 解密pwd
@@ -144,9 +146,9 @@ func backup(backupConf entity.BackupConfig, encryptKey string) (outFileName os.F
 	// create shell file
 	var shellName string
 	if runtime.GOOS == "windows" {
-		shellName = time.Now().Format("shell-2006-01-02-15-04-") + "backup.bat"
+		shellName = time.Now().Format("shell-"+util.FileNameFormatStr+"-") + "backup.bat"
 	} else {
-		shellName = time.Now().Format("shell-2006-01-02-15-04-") + "backup.sh"
+		shellName = time.Now().Format("shell-"+util.FileNameFormatStr+"-") + "backup.sh"
 	}
 
 	shellFile, err := os.Create(backupConf.GetProjectPath() + string(os.PathSeparator) + shellName)

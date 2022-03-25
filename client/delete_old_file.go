@@ -41,6 +41,10 @@ func deleteLocalOlderFiles(backupConf entity.BackupConfig) {
 	if err != nil {
 		log.Printf("读取项目 %s 的本地目录失败! ERR: %s\n", backupConf.ProjectName, err)
 	}
+	if backupConf.SaveDays <= 0 {
+		log.Printf("项目 %s 的本地保存(天)设置不正确", backupConf.ProjectName)
+		return
+	}
 	backupFileNames := make([]string, len(backupFiles))
 	for _, backupFile := range backupFiles {
 		backupFileNames = append(backupFileNames, backupFile.Name())
@@ -61,6 +65,10 @@ func deleteLocalOlderFiles(backupConf entity.BackupConfig) {
 // deleteS3OlderFiles 删除对象存储的过时文件
 func deleteS3OlderFiles(s3Conf entity.S3Config, backupConf entity.BackupConfig) {
 	if !s3Conf.CheckNotEmpty() {
+		return
+	}
+	if backupConf.SaveDaysS3 <= 0 {
+		log.Printf("项目 %s 的对象存储保存(天)设置不正确", backupConf.ProjectName)
 		return
 	}
 	fileNames, err := s3Conf.ListFiles(backupConf.GetProjectPath())

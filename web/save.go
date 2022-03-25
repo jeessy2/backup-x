@@ -44,6 +44,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	forms := request.PostForm
 	for index, projectName := range forms["ProjectName"] {
 		saveDays, _ := strconv.Atoi(forms["SaveDays"][index])
+		saveDaysS3, _ := strconv.Atoi(forms["SaveDaysS3"][index])
 		startTime, _ := strconv.Atoi(forms["StartTime"][index])
 		period, _ := strconv.Atoi(forms["Period"][index])
 		conf.BackupConfig = append(
@@ -52,6 +53,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 				ProjectName: projectName,
 				Command:     forms["Command"][index],
 				SaveDays:    saveDays,
+				SaveDaysS3:  saveDaysS3,
 				StartTime:   startTime,
 				Period:      period,
 				Pwd:         forms["Pwd"][index],

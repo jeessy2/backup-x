@@ -70,9 +70,20 @@
                     <div class="col-sm-10">
                       <textarea class="form-control" name="Command" id="Command_{{$i}}" rows="3" aria-describedby="Command_help">{{$v.Command}}</textarea>
                       <small id="Command_help" class="form-text text-muted">
-                        须包含#{DATE}变量, #{PWD}为下方的密码变量 <a target="blank" href="https://github.com/jeessy2/backup-x#备份脚本参考">备份脚本参考</a> 
-                        <br/>例：mysqldump -h192.168.1.11 -uroot -p#{PWD} db-name > #{DATE}.sql
+                        日期变量 #{DATE} ,下方的密码变量 #{PWD} ,下方的对象存储变量: #{Endpoint} #{AccessKey} #{SecretKey} #{BucketName}
+                        <br/>例: mysqldump -h192.168.1.11 -uroot -p#{PWD} db-name > #{DATE}.sql <a target="blank" href="https://github.com/jeessy2/backup-x#备份脚本参考">备份脚本参考</a> 
                       </small>
+                    </div>
+                  </div>
+
+                  <div class="form-group row">
+                    <label for="BackupType_{{$i}}" class="col-sm-2">备份类型</label>
+                    <div class="col-sm-10">
+                      <select class="form-control" name="BackupType" id="BackupType_{{$i}}" value="{{$v.BackupType}}">
+                        <option value="0" {{if eq $v.BackupType 0}}selected{{end}}>备份数据库</option>
+                        <option value="1" {{if eq $v.BackupType 1}}selected{{end}}>同步文件</option>
+                      </select>
+                      <small id="BackupType_help" class="form-text text-muted">如果没有输出文件, 请选择同步文件</small>
                     </div>
                   </div>
 
@@ -96,7 +107,7 @@
 
                   <div class="form-group row">
                     <label for="StartTime_{{$i}}" class="col-sm-2 col-form-label">备份起始时间</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-4">
                       <select class="form-control" name="StartTime" id="StartTime_{{$i}}" value="{{$v.StartTime}}">
                         <option value="0" {{if eq $v.StartTime 0}}selected{{end}}>0:00</option>
                         <option value="1" {{if eq $v.StartTime 1}}selected{{end}}>1:00</option>
@@ -124,11 +135,8 @@
                         <option value="23" {{if eq $v.StartTime 23}}selected{{end}}>23:00</option>
                       </select>
                     </div>
-                  </div>
-
-                  <div class="form-group row">
                     <label for="Period_{{$i}}" class="col-sm-2 col-form-label">备份周期(分钟)</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-4">
                       <input type="number" class="form-control" name="Period" id="Period_{{$i}}" value="{{$v.Period}}" min="1">
                     </div>
                   </div>

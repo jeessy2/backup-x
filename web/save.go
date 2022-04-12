@@ -47,6 +47,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 		saveDaysS3, _ := strconv.Atoi(forms["SaveDaysS3"][index])
 		startTime, _ := strconv.Atoi(forms["StartTime"][index])
 		period, _ := strconv.Atoi(forms["Period"][index])
+		backupType, _ := strconv.Atoi(forms["BackupType"][index])
 		conf.BackupConfig = append(
 			conf.BackupConfig,
 			entity.BackupConfig{
@@ -57,6 +58,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 				StartTime:   startTime,
 				Period:      period,
 				Pwd:         forms["Pwd"][index],
+				BackupType:  backupType,
 			},
 		)
 	}

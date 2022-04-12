@@ -21,7 +21,7 @@
     jeessy/backup-x
   ```
 - 登录 http://your_docker_ip:9977 并配置
-- docker容器默认安装default-mysql-client/postgres-client
+- docker容器默认安装default-mysql-client/postgres-client/[s3sync](https://github.com/larrabee/s3sync)
 
 ## 系统中使用
 - 下载并解压[https://github.com/jeessy2/backup-x/releases](https://github.com/jeessy2/backup-x/releases)
@@ -59,9 +59,19 @@
 
     |  说明   | 备份脚本  |
     |  ----  | ----  |
-    | tar压缩备份 | tar -zcvf #{DATE}.tar.gz /home/projects |
-    | 还原 | tar -zxvf 2021-11-12_10_29.tar.gz |
+    | 备份本地文件到对象存储 [s3sync](https://github.com/larrabee/s3sync) | s3sync --fs-disable-xattr --filter-not-exist --tk #{AccessKey} --ts #{SecretKey} --te #{Endpoint} fs:///opt/test/ s3://#{BucketName}/test/ |
+    | 备份对象存储到对象存储 [s3sync](https://github.com/larrabee/s3sync) | s3sync --filter-not-exist --sk source_key -ss #{PWD} --se https://s3.source.com --tk #{AccessKey} --ts #{SecretKey} --te #{Endpoint} s3://backup/ s3://#{BucketName}/ |
 
+  - 变量说明
+
+    |  变量名   | 说明  |
+    |  ----  | ----  |
+    |  #{DATE}  | 年-月-日_时_分  |
+    |  #{PWD}   | 下方的密码变量  |
+    |  #{Endpoint}  | 下方的对象存储变量 Endpoint  |
+    |  #{AccessKey}  | 下方的对象存储变量 AccessKey  |
+    |  #{SecretKey}  | 下方的对象存储变量 SecretKey  |
+    |  #{BucketName}  | 下方的对象存储变量 BucketName  |
 ## webhook
 - 支持webhook, 备份更新成功或不成功时, 会回调填写的URL
 - 支持的变量

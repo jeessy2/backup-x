@@ -37,7 +37,7 @@ func WritingConfig(writer http.ResponseWriter, request *http.Request) {
 	// 获得环境变量
 	backupConf := []entity.BackupConfig{}
 	for i := 0; i < 16; i++ {
-		backupConf = append(backupConf, entity.BackupConfig{SaveDays: 30, SaveDaysS3: 60, StartTime: 1, Period: 1440})
+		backupConf = append(backupConf, entity.BackupConfig{SaveDays: 30, SaveDaysS3: 60, StartTime: 1, Period: 1440, BackupType: 0})
 	}
 	conf = entity.Config{
 		BackupConfig: backupConf,

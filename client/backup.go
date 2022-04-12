@@ -95,17 +95,19 @@ func run(conf entity.Config, backupConf entity.BackupConfig) {
 			return
 		}
 		// backup
-		outFileName, err := backup(backupConf, conf.EncryptKey)
+		outFileName, err := backup(backupConf, conf.EncryptKey, conf.S3Config)
 		result := entity.BackupResult{ProjectName: backupConf.ProjectName, Result: "失败"}
 		if err == nil {
 			// webhook
-			result.FileName = outFileName.Name()
-			result.FileSize = fmt.Sprintf("%d MB", outFileName.Size()/1000/1000)
-			result.Result = "成功"
-			// send file to s3
-			if conf.S3Config.CheckNotEmpty() {
-				go conf.S3Config.UploadFile(backupConf.GetProjectPath() + string(os.PathSeparator) + outFileName.Name())
+			if outFileName != nil {
+				result.FileName = outFileName.Name()
+				result.FileSize = fmt.Sprintf("%d MB", outFileName.Size()/1000/1000)
+				// send file to s3
+				if conf.S3Config.CheckNotEmpty() {
+					go conf.S3Config.UploadFile(backupConf.GetProjectPath() + string(os.PathSeparator) + outFileName.Name())
+				}
 			}
+			result.Result = "成功"
 		}
 		conf.ExecWebhook(result)
 	}
@@ -116,14 +118,10 @@ func prepare(backupConf entity.BackupConfig) (err error) {
 	// create floder
 	os.MkdirAll(backupConf.GetProjectPath(), 0750)
 
-	if !strings.Contains(backupConf.Command, "#{DATE}") {
-		err = errors.New("项目: " + backupConf.ProjectName + "的备份脚本须包含#{DATE}")
-	}
-
 	return
 }
 
-func backup(backupConf entity.BackupConfig, encryptKey string) (outFileName os.FileInfo, err error) {
+func backup(backupConf entity.BackupConfig, encryptKey string, s3Conf entity.S3Config) (outFileName os.FileInfo, err error) {
 	projectName := backupConf.ProjectName
 	log.Printf("正在备份项目: %s ...", projectName)
 
@@ -140,8 +138,22 @@ func backup(backupConf entity.BackupConfig, encryptKey string) (outFileName os.F
 			return nil, err
 		}
 	}
+	// 解密s3 SecretKey
+	secretKey := ""
+	if s3Conf.SecretKey != "" {
+		secretKey, err = util.DecryptByEncryptKey(encryptKey, s3Conf.SecretKey)
+		if err != nil {
+			err = fmt.Errorf("解密失败")
+			log.Println(err)
+			return nil, err
+		}
+	}
 
 	shellString = strings.ReplaceAll(shellString, "#{PWD}", pwd)
+	shellString = strings.ReplaceAll(shellString, "#{AccessKey}", s3Conf.AccessKey)
+	shellString = strings.ReplaceAll(shellString, "#{SecretKey}", secretKey)
+	shellString = strings.ReplaceAll(shellString, "#{Endpoint}", s3Conf.Endpoint)
+	shellString = strings.ReplaceAll(shellString, "#{BucketName}", s3Conf.BucketName)
 
 	// create shell file
 	var shellName string
@@ -170,7 +182,7 @@ func backup(backupConf entity.BackupConfig, encryptKey string) (outFileName os.F
 	shell.Dir = backupConf.GetProjectPath()
 	outputBytes, err := shell.CombinedOutput()
 	if len(outputBytes) > 0 {
-		log.Printf("<span title=\"%s\">%s 执行shell的输出：鼠标移动此处查看</span>\n", util.EscapeShell(string(outputBytes)), backupConf.ProjectName)
+		log.Printf("<span title=\"%s\">%s 执行shell的输出: 鼠标移动此处查看</span>\n", util.EscapeShell(string(outputBytes)), backupConf.ProjectName)
 	} else {
 		log.Printf("执行shell的输出为空\n")
 	}
@@ -179,22 +191,29 @@ func backup(backupConf entity.BackupConfig, encryptKey string) (outFileName os.F
 	if err == nil {
 		// find backup file by todayString
 		outFileName, err = findBackupFile(backupConf, todayString)
-
-		// check file size
-		if err != nil {
-			log.Println(err)
-		} else if outFileName.Size() >= 200 {
-			log.Printf("成功备份项目: %s, 文件名: %s\n", projectName, outFileName.Name())
-			// success, remove shell file
-			os.Remove(shellFile.Name())
+		if backupConf.BackupType == 0 {
+			// 备份数据库
+			// check file size
+			if err != nil {
+				log.Println(err)
+			} else if outFileName.Size() >= 200 {
+				log.Printf("成功备份项目: %s, 文件名: %s\n", projectName, outFileName.Name())
+			} else {
+				err = errors.New(projectName + " 备份后的文件大小小于200字节, 当前大小：" + strconv.Itoa(int(outFileName.Size())))
+				log.Println(err)
+			}
 		} else {
-			err = errors.New(projectName + " 备份后的文件大小小于200字节, 当前大小：" + strconv.Itoa(int(outFileName.Size())))
-			log.Println(err)
+			// 1 同步文件
+			// err = nil
+			err = nil
 		}
 	} else {
 		err = fmt.Errorf("执行备份shell失败: %s", util.EscapeShell(string(outputBytes)))
 		log.Println(err)
 	}
+
+	// remove shell file
+	os.Remove(shellFile.Name())
 
 	return
 }
@@ -203,11 +222,13 @@ func backup(backupConf entity.BackupConfig, encryptKey string) (outFileName os.F
 func findBackupFile(backupConf entity.BackupConfig, todayString string) (backupFile os.FileInfo, err error) {
 	files, err := ioutil.ReadDir(backupConf.GetProjectPath())
 	for _, file := range files {
-		if strings.Contains(file.Name(), todayString) {
+		if strings.Contains(file.Name(), todayString) && !strings.HasPrefix(file.Name(), "shell-") {
 			backupFile = file
 			return
 		}
 	}
-	err = errors.New("不能找到备份后的文件，没有找到包含 " + todayString + " 的文件名")
+
+	err = fmt.Errorf("项目 %s 没有输出包含 %s 的文件名", backupConf.ProjectName, todayString)
+
 	return
 }

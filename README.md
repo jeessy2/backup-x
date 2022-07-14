@@ -61,6 +61,7 @@
     |  ----  | ----  |
     | 备份本地文件到对象存储 [s3sync](https://github.com/larrabee/s3sync) | s3sync --fs-disable-xattr --filter-not-exist --tk #{AccessKey} --ts #{SecretKey} --te #{Endpoint} fs:///opt/test/ s3://#{BucketName}/test/ |
     | 备份对象存储到对象存储 [s3sync](https://github.com/larrabee/s3sync) | s3sync --filter-not-exist --sk source_key -ss #{PWD} --se https://s3.source.com --tk #{AccessKey} --ts #{SecretKey} --te #{Endpoint} s3://backup/ s3://#{BucketName}/ |
+    | 备份本地文件到对象存储 [rclone](https://rclone.org/) | 参考rclone文档。推荐在系统中使用rclone |
 
   - 变量说明
 

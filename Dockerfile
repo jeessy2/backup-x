@@ -11,7 +11,7 @@ RUN go env -w GO111MODULE=on \
 FROM golang:1.17 AS s3sync
 
 WORKDIR /src/
-RUN git clone --branch 2.33 https://github.com/larrabee/s3sync.git
+RUN git clone --branch 2.34 https://github.com/larrabee/s3sync.git
 
 WORKDIR /src/s3sync
 ENV CGO_ENABLED 0

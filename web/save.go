@@ -48,6 +48,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 		startTime, _ := strconv.Atoi(forms["StartTime"][index])
 		period, _ := strconv.Atoi(forms["Period"][index])
 		backupType, _ := strconv.Atoi(forms["BackupType"][index])
+		enabled, _ := strconv.Atoi(forms["Enabled"][index])
 		conf.BackupConfig = append(
 			conf.BackupConfig,
 			entity.BackupConfig{
@@ -59,6 +60,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 				Period:      period,
 				Pwd:         forms["Pwd"][index],
 				BackupType:  backupType,
+				Enabled:     enabled,
 			},
 		)
 	}

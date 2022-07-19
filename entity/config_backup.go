@@ -10,6 +10,7 @@ type BackupConfig struct {
 	Period      int    // 间隔周期(分钟)
 	Pwd         string // 密码
 	BackupType  int    // 备份类型 0 数据库备份 1 文件同步
+	Enabled     int    // 是否启用 0 启用 1 停用
 }
 
 // GetProjectPath 获得项目路径

@@ -39,8 +39,13 @@ func RunLoop() {
 			continue
 		}
 
+		if backupConf.Enabled != 0 {
+			log.Println(backupConf.ProjectName + " 项目被停用")
+			continue
+		}
+
 		if !backupConf.CheckPeriod() {
-			log.Println(backupConf.ProjectName + "的周期值不正确")
+			log.Println(backupConf.ProjectName + " 项目的周期值不正确")
 			continue
 		}
 
@@ -88,7 +93,7 @@ func RunOnce() {
 
 // run
 func run(conf entity.Config, backupConf entity.BackupConfig) {
-	if backupConf.NotEmptyProject() {
+	if backupConf.NotEmptyProject() && backupConf.Enabled == 0 {
 		err := prepare(backupConf)
 		if err != nil {
 			log.Println(err)

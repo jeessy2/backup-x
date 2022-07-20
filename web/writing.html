@@ -49,6 +49,9 @@
                     {{else}}
                     {{$v.ProjectName}}
                     {{end}}
+                    {{if ne $v.Enabled 0}}
+                    <span class="badge badge-pill badge-warning">停用</span>
+                    {{end}}
                   </a>
                   {{end}}
                 </div>
@@ -86,7 +89,7 @@
                   <div class="form-group row">
                     <label for="Enabled_{{$i}}" class="col-sm-2">是否启用</label>
                     <div class="col-sm-4">
-                      <select class="form-control" name="Enabled" id="Enabled_{{$i}}" value="{{$v.Enabled}}">
+                      <select class="form-control" name="Enabled" id="Enabled_{{$i}}" value="{{$v.Enabled}}" onchange="enabledChange(this)">
                         <option value="0" {{if eq $v.Enabled 0}}selected{{end}}>启用</option>
                         <option value="1" {{if eq $v.Enabled 1}}selected{{end}}>停用</option>
                       </select>
@@ -298,8 +301,16 @@
     // projectNameChange
     function projectNameChange(that) {
       let id = $(that).attr("id").split("_")[1]
-      console.log($(that).val())
-      $("#id_"+id).html($(that).val())
+      let name = $(that).val()
+      let enabled = $("#Enabled_"+id).val()
+      $("#id_"+id).html(enabled == 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
+    }
+    // enabledChange
+    function enabledChange(that) {
+      let id = $(that).attr("id").split("_")[1]
+      let name = $("#ProjectName_"+id).val()
+      let enabled = $(that).val()
+      $("#id_"+id).html(enabled == 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
     }
 
   </script>

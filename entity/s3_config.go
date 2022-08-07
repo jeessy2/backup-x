@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -49,8 +50,15 @@ func (s3Config S3Config) getSession() (*session.Session, error) {
 		log.Println(err)
 	}
 
+	region := "cn-north-1"
+	if strings.HasSuffix(s3Config.Endpoint, "amazonaws.com") {
+		sp := strings.Split(s3Config.Endpoint, ".")
+		if len(sp) > 1 {
+			region = sp[1]
+		}
+	}
 	config := &aws.Config{
-		Region:           aws.String("cn-north-1"),
+		Region:           aws.String(region),
 		Endpoint:         aws.String(s3Config.Endpoint),
 		DisableSSL:       aws.Bool(false),
 		Credentials:      creds,

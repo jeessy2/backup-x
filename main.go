@@ -107,8 +107,8 @@ func (p *program) Start(s service.Service) error {
 	return nil
 }
 func (p *program) run() {
-	// 服务运行，延时10秒运行，等待网络
-	run(10 * time.Second)
+	// 服务运行，延时20秒运行，等待网络
+	run(20 * time.Second)
 }
 func (p *program) Stop(s service.Service) error {
 	// Stop should not block. Return with a few seconds.
@@ -117,7 +117,6 @@ func (p *program) Stop(s service.Service) error {
 
 func getService() service.Service {
 	options := make(service.KeyValue)
-	options["UserService"] = true
 	svcConfig := &service.Config{
 		Name:        "backup-x",
 		DisplayName: "backup-x",

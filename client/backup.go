@@ -187,6 +187,9 @@ func backup(backupConf entity.BackupConfig, encryptKey string, s3Conf entity.S3C
 	shell.Dir = backupConf.GetProjectPath()
 	outputBytes, err := shell.CombinedOutput()
 	if len(outputBytes) > 0 {
+		if util.IsGBK(outputBytes) {
+			outputBytes, _ = util.GbkToUtf8(outputBytes)
+		}
 		log.Printf("<span title=\"%s\">%s 执行shell的输出: 鼠标移动此处查看</span>\n", util.EscapeShell(string(outputBytes)), backupConf.ProjectName)
 	} else {
 		log.Printf("执行shell的输出为空\n")

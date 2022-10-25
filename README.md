@@ -46,6 +46,7 @@
     | 备份单个  | PGPASSWORD="#{PWD}" pg_dump --host 192.168.1.11 --port 5432 --dbname db-name --user postgres --clean --create --file #{DATE}.sql |
     | 备份全部  | PGPASSWORD="#{PWD}" pg_dumpall --host 192.168.1.11 --port 5432 --user postgres --clean --file #{DATE}.sql |
     | 还原  | psql -U postgres -f 2021-11-12_10_29.sql |
+    | 还原指定  | psql -U postgres -d dn-name -f 2021-11-12_10_29.sql |
 
  -  mysql/mariadb
 

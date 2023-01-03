@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_REPO: jeessy/backup-x
-      DOCKER_PLATFORMS: linux/amd64,linux/arm,linux/arm64
+      DOCKER_PLATFORMS: linux/amd64,linux/arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v3

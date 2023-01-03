@@ -4,7 +4,6 @@ FROM golang:1.19 AS builder
 WORKDIR /app
 COPY . .
 RUN go env -w GO111MODULE=on \
-    && go env -w GOPROXY=https://goproxy.cn,direct \
     && make clean test build
 
 # build s3sync
@@ -31,7 +30,7 @@ RUN apt-get -y update \
 # https://www.postgresql.org/download/linux/debian/
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
     && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && apt-get update
+    && apt-get -y update
 
 RUN apt-get install -y postgresql-client-14 \
     && apt-get install -y default-mysql-client

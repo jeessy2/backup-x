@@ -25,9 +25,15 @@ FROM debian:stable-slim
 LABEL name=backup-x
 LABEL url=https://github.com/jeessy2/backup-x
 
-RUN apt-get -y update  \
-    && apt-get install -y ca-certificates curl  \
-    && apt-get install -y postgresql-client \
+RUN apt-get -y update \
+    && apt-get install -y wget curl gpg gnupg2 software-properties-common apt-transport-https lsb-release ca-certificates
+
+# https://www.postgresql.org/download/linux/debian/
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && apt-get update
+
+RUN apt-get install -y postgresql-client-14 \
     && apt-get install -y default-mysql-client
 
 WORKDIR /app

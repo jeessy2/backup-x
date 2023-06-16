@@ -31,7 +31,8 @@
         <form>
 
           <button class="btn btn-primary submit_btn" style="margin-bottom: 15px;">Save</button>
-          <button class="btn btn-warning submit_btn_backupNow" style="margin-bottom: 15px;margin-left: 15px;">Save & Backup Now</button>
+          <button class="btn btn-primary submit_btn_backup_idx" style="margin-bottom: 15px;margin-left: 15px;">Save & 立即备份选中</button>
+          <button class="btn btn-warning submit_btn_backup_all" style="margin-bottom: 15px;margin-left: 15px;">Save & 立即备份全部</button>
 
           <div class="alert" style="display: none;">
             <strong id="resultMsg"></strong>
@@ -43,7 +44,7 @@
               <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                   {{range $i, $v := .BackupConfig}}
-                  <a class="nav-item nav-link {{if eq $i 0}}active{{end}}" id="id_{{$i}}" data-toggle="tab" href="#content_{{$i}}" role="tab">
+                  <a class="nav-item nav-link {{if eq $i 0}}active{{end}}" id="id_{{$i}}" data-toggle="tab" href="#content_{{$i}}" onclick="contentChange('{{$i}}')" role="tab">
                     {{if eq $v.ProjectName ""}}
                     {{$i}}
                     {{else}}
@@ -254,7 +255,8 @@
           </div>
 
           <button class="btn btn-primary submit_btn" style="margin-bottom: 15px;">Save</button>
-          <button class="btn btn-warning submit_btn_backupNow" style="margin-bottom: 15px;margin-left: 15px;">Save & Backup Now</button>
+          <button class="btn btn-primary submit_btn_backup_idx" style="margin-bottom: 15px;margin-left: 15px;">Save & 立即备份选中</button>
+          <button class="btn btn-warning submit_btn_backup_all" style="margin-bottom: 15px;margin-left: 15px;">Save & 立即备份全部</button>
         </form>
       </div>
 
@@ -267,14 +269,26 @@
   </main>
 
   <script>
+    let contentIdx = 0
+
+    function contentChange(i) {
+      contentIdx = i
+    }
 
     $(function(){
-      $(".submit_btn,.submit_btn_backupNow").on('click',function(e) {
+      $(".submit_btn,.submit_btn_backup_all,.submit_btn_backup_idx").on('click',function(e) {
         e.preventDefault();
         $('body').animate({ scrollTop: 0 }, 300);
+        let url = "/save"
+        if(e.target.classList.contains("submit_btn_backup_all")) {
+          url += "?backupAll=true"
+        }
+        if(e.target.classList.contains("submit_btn_backup_idx")) {
+          url += "?backupIdx="+contentIdx
+        }
         $.ajax({
           method: "POST",
-          url: "/save?backupNow=" + e.target.classList.contains("submit_btn_backupNow"),
+          url: url,
           data: $('form').serialize(),
           success: function (result) {
             $('.alert').css("display", "block");
@@ -312,6 +326,8 @@
       let enabled = $(that).val()
       $("#id_"+id).html(enabled == 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
     }
+
+
 
   </script>
 

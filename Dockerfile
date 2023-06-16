@@ -1,5 +1,5 @@
 # build stage
-FROM golang:1.19 AS builder
+FROM golang:1.20 AS builder
 
 WORKDIR /app
 COPY . .
@@ -7,10 +7,10 @@ RUN go env -w GO111MODULE=on \
     && make clean test build
 
 # build s3sync
-FROM golang:1.19 AS s3sync
+FROM golang:1.20 AS s3sync
 
 WORKDIR /src/
-RUN git clone --branch 2.40 https://github.com/larrabee/s3sync.git
+RUN git clone --branch 2.55 https://github.com/larrabee/s3sync.git
 
 WORKDIR /src/s3sync
 ENV CGO_ENABLED 0

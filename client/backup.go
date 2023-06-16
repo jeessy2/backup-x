@@ -91,6 +91,16 @@ func RunOnce() {
 	}
 }
 
+// 运行指定的索引号
+func RunByIdx(idx int) {
+	conf, err := entity.GetConfigCache()
+	if err != nil {
+		return
+	}
+
+	run(conf, conf.BackupConfig[idx])
+}
+
 // run
 func run(conf entity.Config, backupConf entity.BackupConfig) {
 	if backupConf.NotEmptyProject() && backupConf.Enabled == 0 {

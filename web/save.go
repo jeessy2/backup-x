@@ -4,6 +4,7 @@ import (
 	"backup-x/client"
 	"backup-x/entity"
 	"backup-x/util"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -102,8 +103,16 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	// 没有错误
 	if err == nil {
 		conf.CreateBucketIfNotExist()
-		if request.URL.Query().Get("backupNow") == "true" {
+		if request.URL.Query().Get("backupAll") == "true" {
 			go client.RunOnce()
+		}
+		if request.URL.Query().Get("backupIdx") != "" {
+			idx, err := strconv.Atoi(request.URL.Query().Get("backupIdx"))
+			if err == nil {
+				go client.RunByIdx(idx)
+			} else {
+				log.Println("索引号不正确" + request.URL.Query().Get("backupIdx"))
+			}
 		}
 		// 重新进行循环
 		client.StopRunLoop()

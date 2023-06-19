@@ -43,18 +43,18 @@
 
     |  说明   | 备份脚本  |
     |  ----  | ----  |
-    | 备份单个  | PGPASSWORD="#{PWD}" pg_dump --host 192.168.1.11 --port 5432 --dbname db-name --user postgres --clean --create --file #{DATE}.sql |
-    | 备份全部  | PGPASSWORD="#{PWD}" pg_dumpall --host 192.168.1.11 --port 5432 --user postgres --clean --file #{DATE}.sql |
+    | 备份单个  | PGPASSWORD="#{PWD}" pg_dump --host 127.0.0.1 --port 5432 --dbname name --user postgres --create --file #{DATE}.sql |
+    | 备份全部  | PGPASSWORD="#{PWD}" pg_dumpall --host 127.0.0.1 --port 5432 --user postgres --create --file #{DATE}.sql |
     | 还原  | psql -U postgres -f 2021-11-12_10_29.sql |
-    | 还原指定  | psql -U postgres -d dn-name -f 2021-11-12_10_29.sql |
+    | 还原指定  | psql -U postgres -d name -f 2021-11-12_10_29.sql |
 
  -  mysql/mariadb
 
     |  说明   | 备份脚本  |
     |  ----  | ----  |
-    | 备份单个  | mysqldump -h192.168.1.11 -uroot -p#{PWD} db-name > #{DATE}.sql |
-    | 备份全部  | mysqldump -h192.168.1.11 -uroot -p#{PWD} --all-databases > #{DATE}.sql |
-    | 还原  | mysql -uroot -p123456 db-name <2021-11-12_10_29.sql |
+    | 备份单个  | mysqldump -h127.0.0.1 -uroot -p#{PWD} name > #{DATE}.sql |
+    | 备份全部  | mysqldump -h127.0.0.1 -uroot -p#{PWD} --all-databases > #{DATE}.sql |
+    | 还原  | mysql -uroot -p123456 name <2021-11-12_10_29.sql |
 
  -  文件
 

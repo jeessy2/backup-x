@@ -3,7 +3,6 @@ package client
 import (
 	"backup-x/entity"
 	"backup-x/util"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -22,7 +21,8 @@ func DeleteOldBackup() {
 		}
 
 		for _, backupConf := range conf.BackupConfig {
-			if !backupConf.NotEmptyProject() {
+			// empty project and disabeld
+			if !backupConf.NotEmptyProject() || backupConf.Enabled == 1 {
 				continue
 			}
 			// 删除本地的过时文件
@@ -37,7 +37,7 @@ func DeleteOldBackup() {
 
 // deleteLocalOlderFiles 删除本地的过时文件
 func deleteLocalOlderFiles(backupConf entity.BackupConfig) {
-	backupFiles, err := ioutil.ReadDir(backupConf.GetProjectPath())
+	backupFiles, err := os.ReadDir(backupConf.GetProjectPath())
 	if err != nil {
 		log.Printf("读取项目 %s 的本地目录失败! ERR: %s\n", backupConf.ProjectName, err)
 	}

@@ -125,12 +125,29 @@ func (p *program) Stop(s service.Service) error {
 
 func getService() service.Service {
 	options := make(service.KeyValue)
+	var depends []string
+
+	// 确保服务等待网络就绪后再启动
+	switch service.ChosenSystem().String() {
+	case "windows-service":
+		// 将 Windows 服务的启动类型设为自动(延迟启动)
+		options["DelayedAutoStart"] = true
+	default:
+		// 向 Systemd 添加网络依赖
+		depends = append(depends, "Requires=network.target",
+			"After=network-online.target")
+	}
+
+	// run as user service
+	options["UserService"] = true
+
 	svcConfig := &service.Config{
-		Name:        "backup-x",
-		DisplayName: "backup-x",
-		Description: "带Web界面的数据库/文件备份增强工具",
-		Arguments:   []string{"-l", *listen, "-d", *backupDir},
-		Option:      options,
+		Name:         "backup-x",
+		DisplayName:  "backup-x",
+		Description:  "带Web界面的数据库/文件备份增强工具",
+		Arguments:    []string{"-l", *listen, "-d", *backupDir},
+		Dependencies: depends,
+		Option:       options,
 	}
 
 	prg := &program{}

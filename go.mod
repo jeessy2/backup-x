@@ -3,7 +3,7 @@ module backup-x
 go 1.20
 
 require (
-	github.com/aws/aws-sdk-go v1.44.283
+	github.com/aws/aws-sdk-go v1.44.293
 	github.com/kardianos/service v1.2.2
 	gopkg.in/yaml.v2 v2.4.0
 )

@@ -42,8 +42,13 @@ RUN mkdir -p /root/.config/rclone/ && \
 WORKDIR /app
 
 VOLUME /app/backup-x-files
+
+# config ENV and rclone-default-config-path
 ENV TZ=Asia/Shanghai
+ENV XDG_CONFIG_HOME=/app/backup-x-files
+
 COPY --from=builder /app/backup-x /app/backup-x
 COPY --from=s3sync /src/s3sync/s3sync /usr/local/bin/s3sync
+
 EXPOSE 9977
 ENTRYPOINT ["/app/backup-x"]

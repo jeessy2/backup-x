@@ -15,13 +15,24 @@
 ## docker中使用
 - 运行docker容器（`/opt/backup-x-files`可替换为主机的目录）
   ```
+  默认启动：
+  
   docker run -d --name backup-x --restart=always \
     -p 9977:9977 \
     -v /opt/backup-x-files:/app/backup-x-files \
     jeessy/backup-x
   ```
+  ```
+  rclone配置：
+  
+  docker run -d --name backup-x --restart=always \
+    -p 9977:9977 \
+    -v /home/rclone:/root/.config/rclone
+    -v /opt/backup-x-files:/app/backup-x-files \
+    jeessy/backup-x
+  ```
 - 登录 http://your_docker_ip:9977 并配置
-- docker容器默认安装default-mysql-client/postgres-client/[s3sync](https://github.com/larrabee/s3sync)
+- docker容器默认安装default-mysql-client/postgres-client/[s3sync](https://github.com/larrabee/s3sync)/rclone/wget/curl
 
 ## 系统中使用
 - 下载并解压[https://github.com/jeessy2/backup-x/releases](https://github.com/jeessy2/backup-x/releases)

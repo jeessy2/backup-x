@@ -33,7 +33,7 @@ func BasicAuth(f ViewFunc) ViewFunc {
 		}
 
 		if ld.FailTimes >= 5 {
-			log.Printf("%s 登陆失败超过5次! 并延时5分钟响应\n", r.RemoteAddr)
+			log.Printf("%s 登录失败超过5次! 并延时5分钟响应\n", r.RemoteAddr)
 			time.Sleep(5 * time.Minute)
 			if ld.FailTimes >= 5 {
 				ld.FailTimes = 0
@@ -67,7 +67,7 @@ func BasicAuth(f ViewFunc) ViewFunc {
 			}
 
 			ld.FailTimes = ld.FailTimes + 1
-			log.Printf("%s 登陆失败!\n", r.RemoteAddr)
+			log.Printf("%s 登录失败!\n", r.RemoteAddr)
 		}
 
 		// 认证失败，提示 401 Unauthorized
@@ -75,6 +75,6 @@ func BasicAuth(f ViewFunc) ViewFunc {
 		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
 		// 401 状态码
 		w.WriteHeader(http.StatusUnauthorized)
-		log.Printf("%s 请求登陆!\n", r.RemoteAddr)
+		log.Printf("%s 请求登录!\n", r.RemoteAddr)
 	}
 }

@@ -261,7 +261,19 @@
       </div>
 
       <div class="col-md-3">
-        <p class="font-weight-light text-break" style="margin-top: 115px;font-size: 13px;" id="logs"></p>
+        <div class="nav nav-tabs" role="tablist" style="margin-top: 50px;">
+          <a class="nav-item nav-link active" href="#x0" data-toggle="tab" onclick="changeLog(1)" role="tab">
+            备份日志
+          </a>
+          <a class="nav-item nav-link" href="#x1" data-toggle="tab" onclick="changeLog(2)" role="tab">
+            登录日志
+          </a>
+          <a class="nav-item nav-link" href="#x2" data-toggle="tab" onclick="changeLog(0)" role="tab">
+            全部日志
+          </a>
+        </div>
+        
+        <p class="font-weight-light text-break" style="margin-top: 10px;font-size: 13px;" id="logs"></p>
         <button type="button" class="btn btn-outline-primary btn-sm" id="clearLogBtn">清空日志</button>
       </div>
     </div>
@@ -270,9 +282,21 @@
 
   <script>
     let contentIdx = 0
+    let logList = [] // 0：所有日志；1：日常日志；2：登录日志
 
     function contentChange(i) {
       contentIdx = i
+    }
+    
+    function changeLog(type = 0) {
+      const curLogList = logList[type]
+      const totalLogList = logList[0]
+      
+      const failedCount = totalLogList.filter(one => one.includes('登录失败')).length
+      const backupCount = totalLogList.filter(one => one.includes('正在备份项目')).length
+      
+      const html = `备份执行次数：${backupCount}次<br/>历史登录失败：${failedCount}个<br/><br/>` + curLogList.join('<br/>')
+      $("#logs").html(html)
     }
 
     $(function(){
@@ -317,14 +341,14 @@
       let id = $(that).attr("id").split("_")[1]
       let name = $(that).val()
       let enabled = $("#Enabled_"+id).val()
-      $("#id_"+id).html(enabled == 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
+      $("#id_"+id).html(enabled === 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
     }
     // enabledChange
     function enabledChange(that) {
       let id = $(that).attr("id").split("_")[1]
       let name = $("#ProjectName_"+id).val()
       let enabled = $(that).val()
-      $("#id_"+id).html(enabled == 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
+      $("#id_"+id).html(enabled === 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
     }
 
 
@@ -334,7 +358,14 @@
   <script>
     function getLogs() {
       $.get("/logs", function(result){
-        $("#logs").html(result)
+        const curList = result.split("<br/>").filter(one => one.length)
+
+        logList[0] = curList.map(one => one)
+        
+        logList[1] = curList.filter(one => !one.includes("登录"))
+        logList[2] = curList.filter(one => one.includes("登录"))
+        
+        changeLog(1)
       })
     }
     getLogs()

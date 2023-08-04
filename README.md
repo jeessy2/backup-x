@@ -15,19 +15,10 @@
 ## docker中使用
 - 运行docker容器（`/opt/backup-x-files`可替换为主机的目录）
   ```
-  默认启动：
+  默认启动-rclone的配置会保存到/app/backup-x-files/rclone/rclone.conf：
   
   docker run -d --name backup-x --restart=always \
     -p 9977:9977 \
-    -v /opt/backup-x-files:/app/backup-x-files \
-    jeessy/backup-x
-  ```
-  ```
-  rclone配置：
-  
-  docker run -d --name backup-x --restart=always \
-    -p 9977:9977 \
-    -v /home/rclone:/root/.config/rclone
     -v /opt/backup-x-files:/app/backup-x-files \
     jeessy/backup-x
   ```

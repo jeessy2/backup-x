@@ -10,7 +10,7 @@ RUN go env -w GO111MODULE=on \
 FROM golang:1.20 AS s3sync
 
 WORKDIR /src/
-RUN git clone --branch 2.55 https://github.com/larrabee/s3sync.git
+RUN git clone --branch 2.61 https://github.com/larrabee/s3sync.git
 
 WORKDIR /src/s3sync
 ENV CGO_ENABLED 0
@@ -35,11 +35,20 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-
 RUN apt-get install -y postgresql-client-14 \
     && apt-get install -y default-mysql-client
 
+# add RCLone to use directly
+RUN mkdir -p /root/.config/rclone/ && \
+    apt-get install -y curl wget rclone vim
+
 WORKDIR /app
 
 VOLUME /app/backup-x-files
+
+# config ENV and rclone-default-config-path
 ENV TZ=Asia/Shanghai
+ENV XDG_CONFIG_HOME=/app/backup-x-files
+
 COPY --from=builder /app/backup-x /app/backup-x
 COPY --from=s3sync /src/s3sync/s3sync /usr/local/bin/s3sync
+
 EXPOSE 9977
 ENTRYPOINT ["/app/backup-x"]

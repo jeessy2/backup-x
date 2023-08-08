@@ -287,6 +287,7 @@
 
   <script>
     let contentIdx = 0
+    let logType = 1
     let logList = [] // 0：所有日志；1：日常日志；2：登录日志
 
     function contentChange(i) {
@@ -294,7 +295,8 @@
     }
     
     function changeLog(type = 0) {
-      const curLogList = logList[type]
+      logType = type
+      const curLogList = logList[logType]
       const totalLogList = logList[0]
       
       const failedCount = totalLogList.filter(one => one.includes('登录失败')).length
@@ -328,6 +330,9 @@
               // ok
               $('.alert').addClass("alert-success").removeClass("alert-danger")
               $('#resultMsg').html("保存成功")
+              setTimeout(() => {
+                getLogs()
+              }, 800)
               setTimeout(function(){
                 $('.alert').css("display", "none");
               }, 3000)
@@ -345,19 +350,16 @@
     function projectNameChange(that) {
       let id = $(that).attr("id").split("_")[1]
       let name = $(that).val()
-      let enabled = $("#Enabled_"+id).val()
-      $("#id_"+id).html(enabled === 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
+      let enabled = +$("#Enabled_"+id).val() === 0
+      $("#id_"+id).html(enabled ? name:name+'<span class="badge badge-pill badge-warning">停用</span>')
     }
     // enabledChange
     function enabledChange(that) {
       let id = $(that).attr("id").split("_")[1]
       let name = $("#ProjectName_"+id).val()
-      let enabled = $(that).val()
-      $("#id_"+id).html(enabled === 0?name:name+'<span class="badge badge-pill badge-warning">停用</span>')
+      let enabled = +$(that).val() === 0
+      $("#id_"+id).html(enabled ? name:name+'<span class="badge badge-pill badge-warning">停用</span>')
     }
-
-
-
   </script>
 
   <script>
@@ -366,11 +368,10 @@
         const curList = result.split("<br/>").filter(one => one.length)
 
         logList[0] = curList.map(one => one)
-        
         logList[1] = curList.filter(one => !one.includes("登录"))
         logList[2] = curList.filter(one => one.includes("登录"))
         
-        changeLog(1)
+        changeLog(logType)
       })
     }
     getLogs()
@@ -413,5 +414,5 @@
       })
     })
   </script>
-
+</body>
 </html>

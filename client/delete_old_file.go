@@ -50,11 +50,13 @@ func deleteLocalOlderFiles(backupConf entity.BackupConfig) {
 		if !backupFile.IsDir() {
 			info, err := backupFile.Info()
 			if err == nil {
-				if info.Size() > 0 {
+				if info.Size() >= minFileSize {
 					backupFileNames = append(backupFileNames, backupFile.Name())
 				} else {
-					log.Println("备份后的文件大小为0字节，将删除备份文件: " + backupConf.GetProjectPath() + string(os.PathSeparator) + backupFile.Name())
-					os.Remove(backupConf.GetProjectPath() + string(os.PathSeparator) + backupFile.Name())
+					if util.IsFileNameDate(backupFile.Name()) {
+						log.Printf("备份后的大小为 %d 字节，小于最低值 %d，将删除备份文件: %s", info.Size(), minFileSize, backupConf.GetProjectPath()+string(os.PathSeparator)+backupFile.Name())
+						os.Remove(backupConf.GetProjectPath() + string(os.PathSeparator) + backupFile.Name())
+					}
 				}
 			}
 		}

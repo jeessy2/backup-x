@@ -5,14 +5,15 @@ import (
 	"backup-x/util"
 	"log"
 	"os"
+	"time"
 )
 
 // DeleteOldBackup for client
 func DeleteOldBackup() {
 	for {
-		// delay := util.GetDelaySeconds(2)
-		// log.Printf("删除过期的备份文件将在 %.1f 小时后运行\n", delay.Hours())
-		// time.Sleep(delay)
+		delay := util.GetDelaySeconds(2)
+		log.Printf("删除过期的备份文件将在 %.1f 小时后运行\n", delay.Hours())
+		time.Sleep(delay)
 
 		conf, err := entity.GetConfigCache()
 		if err != nil {

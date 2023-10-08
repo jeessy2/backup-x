@@ -5,15 +5,14 @@ import (
 	"backup-x/util"
 	"log"
 	"os"
-	"time"
 )
 
 // DeleteOldBackup for client
 func DeleteOldBackup() {
 	for {
-		delay := util.GetDelaySeconds(2)
-		log.Printf("删除过期的备份文件将在 %.1f 小时后运行\n", delay.Hours())
-		time.Sleep(delay)
+		// delay := util.GetDelaySeconds(2)
+		// log.Printf("删除过期的备份文件将在 %.1f 小时后运行\n", delay.Hours())
+		// time.Sleep(delay)
 
 		conf, err := entity.GetConfigCache()
 		if err != nil {
@@ -47,7 +46,17 @@ func deleteLocalOlderFiles(backupConf entity.BackupConfig) {
 	}
 	backupFileNames := make([]string, len(backupFiles))
 	for _, backupFile := range backupFiles {
-		backupFileNames = append(backupFileNames, backupFile.Name())
+		if !backupFile.IsDir() {
+			info, err := backupFile.Info()
+			if err == nil {
+				if info.Size() > 0 {
+					backupFileNames = append(backupFileNames, backupFile.Name())
+				} else {
+					log.Println("备份后的文件大小为0字节，将删除备份文件: " + backupConf.GetProjectPath() + string(os.PathSeparator) + backupFile.Name())
+					os.Remove(backupConf.GetProjectPath() + string(os.PathSeparator) + backupFile.Name())
+				}
+			}
+		}
 	}
 
 	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDays, backupFileNames, backupConf.ProjectName)

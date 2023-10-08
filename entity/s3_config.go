@@ -107,7 +107,7 @@ func (s3Config S3Config) UploadFile(fileName string) {
 		return
 	}
 
-	log.Printf("%s 将会上传到对象存储中...\n", fileName)
+	log.Printf("%s 正在上传至对象存储中...\n", fileName)
 
 	file, err := os.Open(fileName)
 	if err != nil {

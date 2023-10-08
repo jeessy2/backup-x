@@ -50,7 +50,7 @@ func deleteLocalOlderFiles(backupConf entity.BackupConfig) {
 		backupFileNames = append(backupFileNames, backupFile.Name())
 	}
 
-	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDays, backupFileNames)
+	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDays, backupFileNames, backupConf.ProjectName)
 
 	for i := 0; i < len(tobeDeleteFiles); i++ {
 		err := os.Remove(backupConf.GetProjectPath() + string(os.PathSeparator) + tobeDeleteFiles[i])
@@ -76,7 +76,7 @@ func deleteS3OlderFiles(s3Conf entity.S3Config, backupConf entity.BackupConfig) 
 		log.Printf("读取项目 %s 的对象存储目录失败! ERR: %s\n", backupConf.ProjectName, err)
 	}
 
-	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDaysS3, fileNames)
+	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDaysS3, fileNames, backupConf.ProjectName)
 
 	for i := 0; i < len(tobeDeleteFiles); i++ {
 		err := s3Conf.DeleteFile(tobeDeleteFiles[i])

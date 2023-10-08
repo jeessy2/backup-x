@@ -1,6 +1,7 @@
 package util
 
 import (
+	"log"
 	"regexp"
 	"strconv"
 	"time"
@@ -9,7 +10,7 @@ import (
 const FileNameFormatStr = "2006-01-02-15-04"
 
 // FileNameBeforeDays 查找文件名中有多少在指定天数之前的
-func FileNameBeforeDays(days int, fileNames []string) []string {
+func FileNameBeforeDays(days int, fileNames []string, projectName string) []string {
 	oldFiles := make([]string, 0)
 	// 2006-01-02-15-04
 	fileRegxp := regexp.MustCompile(`([\d]{4})-([\d]{2})-([\d]{2})-([\d]{2})-([\d]{2})`)
@@ -23,6 +24,11 @@ func FileNameBeforeDays(days int, fileNames []string) []string {
 			}
 		}
 
+	}
+	// 查找出来的文件数量和总文件数量相同，不删除
+	if len(oldFiles)-len(fileNames) >= 0 {
+		log.Printf("项目 %s 待删除文件为所有的文件，将不会进行删除！\n", projectName)
+		return []string{}
 	}
 	return oldFiles
 }

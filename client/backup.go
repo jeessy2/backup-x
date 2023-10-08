@@ -3,18 +3,19 @@ package client
 import (
 	"backup-x/entity"
 	"backup-x/util"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"runtime"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
+
+// 数据库备份最小的文件大小
+const minFileSize = 1000
 
 // backupLooper
 type backupLooper struct {
@@ -214,10 +215,10 @@ func backup(backupConf entity.BackupConfig, encryptKey string, s3Conf entity.S3C
 			// check file size
 			if err != nil {
 				log.Println(err)
-			} else if outFileName.Size() >= 200 {
+			} else if outFileName.Size() >= minFileSize {
 				log.Printf("成功备份项目: %s, 文件名: %s\n", projectName, outFileName.Name())
 			} else {
-				err = errors.New(projectName + " 备份后的文件大小小于200字节, 当前大小：" + strconv.Itoa(int(outFileName.Size())))
+				err = fmt.Errorf("%s 备份后的文件小于 %d 字节, 当前为：%d 字节", projectName, minFileSize, outFileName.Size())
 				log.Println(err)
 			}
 		} else {

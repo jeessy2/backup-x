@@ -25,9 +25,9 @@ func FileNameBeforeDays(days int, fileNames []string, projectName string) []stri
 		}
 
 	}
-	// 查找出来的文件数量和总文件数量相同，不删除
+	// 待删除的过期文件为所有的文件，将不会进行删除
 	if len(oldFiles)-len(fileNames) >= 0 {
-		log.Printf("项目 %s 待删除文件为所有的文件，将不会进行删除！\n", projectName)
+		log.Printf("项目 %s 待删除的过期文件为所有的文件，将不会进行删除！\n", projectName)
 		return []string{}
 	}
 	return oldFiles

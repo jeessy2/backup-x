@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/static/common.css">
   <script src="/static/jquery-3.5.1.min.js"></script>
   <script src="/static/bootstrap.min.js"></script>
+  <script src="/static/layer/layer.js"></script>
 </head>
 
 <body>
@@ -299,11 +300,35 @@
       const curLogList = logList[logType]
       const totalLogList = logList[0]
       
+      const queryPageCount = totalLogList.filter(one => one.includes('请求登录')).length
       const failedCount = totalLogList.filter(one => one.includes('登录失败')).length
       const backupCount = totalLogList.filter(one => one.includes('正在备份项目')).length
       
-      const html = `备份执行次数：${backupCount}次<br/>历史登录失败：${failedCount}个<br/><br/>` + curLogList.join('<br/>')
+      const html = `备份执行次数：${backupCount}次<br/>`+
+                    `历史页面访问次数：${queryPageCount}<br/>` +
+                    `历史登录失败：${failedCount}个<br/>` +
+              
+                    `<br/>` + curLogList.join('<br/>')
       $("#logs").html(html)
+    }
+    
+    function showLayer(target) {
+      let oriTip = target.getAttribute('tip')
+      const newTip = oriTip.split('\n').join('<br/>')
+      const message = newTip
+              .replace(/(\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\s*INFO\s*:)/gm, '<span style="color: #d8d8d8">$1</span>')
+              .replace(/(\d{4}\/\\d{2}\/\d{2} \d{2}:\d{2}:\d{2}\s*ERROR\s*:)/gm, '<span style="color: #f12e2e">$1</span>')
+      layer.open({
+        type: 1, // page 层类型
+        area: ['800px', '600px'],
+        title: '运行信息',
+        offset: '8%',
+        shade: 0.6, // 遮罩透明度
+        shadeClose: true, // 点击遮罩区域，关闭弹层
+        maxmin: true, // 允许全屏最小化
+        anim: 0, // 0-6 的动画形式，-1 不开启
+        content: `<div style="padding: 10px 20px; font-size: 14px;line-height: 26px;">${message}</div>`
+      });
     }
 
     $(function(){

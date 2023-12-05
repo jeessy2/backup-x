@@ -200,7 +200,7 @@ func backup(backupConf entity.BackupConfig, encryptKey string, s3Conf entity.S3C
 		if util.IsGBK(outputBytes) {
 			outputBytes, _ = util.GbkToUtf8(outputBytes)
 		}
-		log.Printf("<span style='color: #7983f5;font-weight: bold;'>%s</span> 执行shell的输出: <span title=\"%s\" style='cursor: pointer; color: #4a3a3a; font-weight: bold'>鼠标[停留]此处查看</span>\n", backupConf.ProjectName, util.EscapeShell(string(outputBytes)))
+		log.Printf("<span style='color: #7983f5;font-weight: bold;'>%s</span> 执行shell的输出: <span class='click-layer' onclick='showLayer(this)' tip=\"%s\" style='cursor: pointer; color: #4a3a3a; font-weight: bold; border: 2px dashed;'>点击此处查看</span>\n", backupConf.ProjectName, util.EscapeShell(string(outputBytes)))
 	} else {
 		log.Printf("执行shell的输出为空\n")
 	}

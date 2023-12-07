@@ -47,10 +47,22 @@ func deleteLocalOlderFiles(backupConf entity.BackupConfig) {
 	}
 	backupFileNames := make([]string, len(backupFiles))
 	for _, backupFile := range backupFiles {
-		backupFileNames = append(backupFileNames, backupFile.Name())
+		if !backupFile.IsDir() {
+			info, err := backupFile.Info()
+			if err == nil {
+				if info.Size() >= minFileSize {
+					backupFileNames = append(backupFileNames, backupFile.Name())
+				} else {
+					if util.IsFileNameDate(backupFile.Name()) {
+						log.Printf("备份后的大小为 %d 字节，小于最低值 %d，将删除备份文件: %s", info.Size(), minFileSize, backupConf.GetProjectPath()+string(os.PathSeparator)+backupFile.Name())
+						os.Remove(backupConf.GetProjectPath() + string(os.PathSeparator) + backupFile.Name())
+					}
+				}
+			}
+		}
 	}
 
-	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDays, backupFileNames)
+	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDays, backupFileNames, backupConf.ProjectName)
 
 	for i := 0; i < len(tobeDeleteFiles); i++ {
 		err := os.Remove(backupConf.GetProjectPath() + string(os.PathSeparator) + tobeDeleteFiles[i])
@@ -76,7 +88,7 @@ func deleteS3OlderFiles(s3Conf entity.S3Config, backupConf entity.BackupConfig) 
 		log.Printf("读取项目 %s 的对象存储目录失败! ERR: %s\n", backupConf.ProjectName, err)
 	}
 
-	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDaysS3, fileNames)
+	tobeDeleteFiles := util.FileNameBeforeDays(backupConf.SaveDaysS3, fileNames, backupConf.ProjectName)
 
 	for i := 0; i < len(tobeDeleteFiles); i++ {
 		err := s3Conf.DeleteFile(tobeDeleteFiles[i])

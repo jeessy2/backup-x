@@ -176,6 +176,7 @@ func backup(backupConf entity.BackupConfig, encryptKey string, s3Conf entity.S3C
 	if runtime.GOOS == "windows" {
 		shellName = time.Now().Format("shell-"+util.FileNameFormatStr+"-") + "backup.bat"
 	} else {
+		shellString = strings.ReplaceAll(shellString, "\r\n", "\n") // windows to linux
 		shellName = time.Now().Format("shell-"+util.FileNameFormatStr+"-") + "backup.sh"
 	}
 

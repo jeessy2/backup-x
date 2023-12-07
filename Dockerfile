@@ -18,6 +18,9 @@ COPY . ./
 RUN go mod tidy && \
     go build -o s3sync ./cli
 
+# minio mc
+FROM minio/mc:latest AS mc
+
 # final stage
 FROM debian:stable-slim
 
@@ -49,6 +52,7 @@ ENV XDG_CONFIG_HOME=/app/backup-x-files
 
 COPY --from=builder /app/backup-x /app/backup-x
 COPY --from=s3sync /src/s3sync/s3sync /usr/local/bin/s3sync
+COPY --from=mc /usr/local/bin/mc /usr/local/bin/mc
 
 EXPOSE 9977
 ENTRYPOINT ["/app/backup-x"]

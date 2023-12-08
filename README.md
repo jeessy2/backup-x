@@ -14,8 +14,8 @@
 
 ## docker中使用
 - 运行docker容器（`/opt/backup-x-files`可替换为主机的目录）
-  ```
-  默认启动-rclone的配置会保存到/app/backup-x-files/rclone/rclone.conf：
+  ```shell
+  # 默认启动rclone的配置会保存到/app/backup-x-files/rclone/rclone.conf：
   
   docker run -d --name backup-x --restart=always \
     -p 9977:9977 \
@@ -23,7 +23,7 @@
     jeessy/backup-x
   ```
 - 登录 http://your_docker_ip:9977 并配置
-- docker容器默认安装default-mysql-client/postgres-client/[s3sync](https://github.com/larrabee/s3sync)/rclone/wget/curl
+- docker容器默认安装default-mysql-client/postgres-client/[s3sync](https://github.com/jeessy2/s3sync)/rclone/wget/curl/minio mc
 
 ## 系统中使用
 - 下载并解压[https://github.com/jeessy2/backup-x/releases](https://github.com/jeessy2/backup-x/releases)
@@ -56,15 +56,23 @@
     |  ----  | ----  |
     | 备份单个  | mysqldump -h127.0.0.1 -uroot -p#{PWD} name > #{DATE}.sql |
     | 备份全部  | mysqldump -h127.0.0.1 -uroot -p#{PWD} --all-databases > #{DATE}.sql |
-    | 还原  | mysql -uroot -p123456 name <2021-11-12_10_29.sql |
+    | 还原  | mysql -uroot -p123456 name < 2021-11-12_10_29.sql |
 
  -  文件
+    - 备份对象存储到对象存储 [s3sync](https://github.com/jeessy2/s3sync)
+    ```shell
+    s3sync --filter-not-exist \
+      --sk source_key -ss #{PWD} --se https://s3.source.com \
+      --tk #{AccessKey} --ts #{SecretKey} --te #{Endpoint} \
+      s3://backup/ s3://#{BucketName}/
+     ```
 
-    |  说明   | 备份脚本  |
-    |  ----  | ----  |
-    | 备份本地文件到对象存储 [s3sync](https://github.com/larrabee/s3sync) | s3sync --fs-disable-xattr --filter-not-exist --tk #{AccessKey} --ts #{SecretKey} --te #{Endpoint} fs:///opt/test/ s3://#{BucketName}/test/ |
-    | 备份对象存储到对象存储 [s3sync](https://github.com/larrabee/s3sync) | s3sync --filter-not-exist --sk source_key -ss #{PWD} --se https://s3.source.com --tk #{AccessKey} --ts #{SecretKey} --te #{Endpoint} s3://backup/ s3://#{BucketName}/ |
-    | 备份本地文件到对象存储 [rclone](https://rclone.org/) | 参考rclone文档。推荐在系统中使用rclone |
+    - 备份本地文件到对象存储 [s3sync](https://github.com/jeessy2/s3sync)
+    ```shell
+    s3sync --fs-disable-xattr --filter-not-exist \
+      --tk #{AccessKey} --ts #{SecretKey} --te #{Endpoint} \
+      fs:///opt/test/ s3://#{BucketName}/test/
+     ```
 
   - 变量说明
 

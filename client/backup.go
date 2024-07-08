@@ -26,11 +26,13 @@ type backupLooper struct {
 var bl = &backupLooper{Wg: sync.WaitGroup{}}
 
 // RunLoop backup db loop
-func RunLoop() {
+func RunLoop(firstDelay time.Duration) {
 	conf, err := entity.GetConfigCache()
 	if err != nil {
 		return
 	}
+
+	time.Sleep(firstDelay)
 
 	// clear
 	bl.Tickers = []*time.Ticker{}

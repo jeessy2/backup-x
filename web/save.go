@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Save 保存
@@ -116,7 +117,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 		}
 		// 重新进行循环
 		client.StopRunLoop()
-		go client.RunLoop()
+		go client.RunLoop(100 * time.Millisecond)
 	}
 
 	// 回写错误信息

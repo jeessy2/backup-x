@@ -52,7 +52,7 @@ func main() {
 		uninstallService()
 	default:
 		if util.IsRunInDocker() {
-			run()
+			run(100 * time.Millisecond)
 		} else {
 			s := getService()
 			status, _ := s.Status()
@@ -67,7 +67,7 @@ func main() {
 				default:
 					log.Println("可使用 ./backup-x -s install 安装服务运行")
 				}
-				run()
+				run(100 * time.Millisecond)
 			}
 		}
 	}
@@ -81,7 +81,7 @@ func faviconFsFunc(writer http.ResponseWriter, request *http.Request) {
 	http.FileServer(http.FS(faviconEmbededFile)).ServeHTTP(writer, request)
 }
 
-func run() {
+func run(firstDelay time.Duration) {
 	// 启动静态文件服务
 	http.HandleFunc("/static/", web.BasicAuth(staticFsFunc))
 	http.HandleFunc("/favicon.ico", web.BasicAuth(faviconFsFunc))
@@ -97,7 +97,7 @@ func run() {
 
 	// 运行
 	go client.DeleteOldBackup()
-	go client.RunLoop()
+	go client.RunLoop(firstDelay)
 
 	err := http.ListenAndServe(*listen, nil)
 
@@ -116,8 +116,7 @@ func (p *program) Start(s service.Service) error {
 }
 func (p *program) run() {
 	// 服务运行，延时20秒运行，等待网络
-	time.Sleep(20 * time.Second)
-	run()
+	run(20 * time.Second)
 }
 func (p *program) Stop(s service.Service) error {
 	// Stop should not block. Return with a few seconds.

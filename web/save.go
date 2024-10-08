@@ -23,6 +23,13 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	oldConf, _ := entity.GetConfigCache()
 	conf := &entity.Config{}
 
+	if oldConf.Password == "" {
+		if time.Since(startTime) > saveLimit {
+			writer.Write([]byte(fmt.Sprintf("需在 %s 之前完成用户名密码设置,请重启backup-x", startTime.Add(saveLimit).Format("2006-01-02 15:04:05"))))
+			return
+		}
+	}
+
 	conf.EncryptKey = oldConf.EncryptKey
 	if conf.EncryptKey == "" {
 		encryptKey, err := util.GenerateEncryptKey()
@@ -42,10 +49,6 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	if conf.Password != oldConf.Password {
-		if time.Since(startTime) > saveLimit {
-			writer.Write([]byte(fmt.Sprintf("需在 %s 之前完成用户名密码设置,请重启backup-x", startTime.Add(saveLimit).Format("2006-01-02 15:04:05"))))
-			return
-		}
 		encryptPasswd, err := util.EncryptByEncryptKey(conf.EncryptKey, conf.Password)
 		if err != nil {
 			writer.Write([]byte("加密失败"))

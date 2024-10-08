@@ -4,6 +4,7 @@ import (
 	"backup-x/client"
 	"backup-x/entity"
 	"backup-x/util"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,10 +12,23 @@ import (
 	"time"
 )
 
+// 服务启动时间
+var startTime = time.Now()
+
+// 保存限制时间
+var saveLimit = time.Duration(30 * time.Minute)
+
 // Save 保存
 func Save(writer http.ResponseWriter, request *http.Request) {
 	oldConf, _ := entity.GetConfigCache()
 	conf := &entity.Config{}
+
+	if oldConf.Password == "" {
+		if time.Since(startTime) > saveLimit {
+			writer.Write([]byte(fmt.Sprintf("需在 %s 之前完成用户名密码设置,请重启backup-x", startTime.Add(saveLimit).Format("2006-01-02 15:04:05"))))
+			return
+		}
+	}
 
 	conf.EncryptKey = oldConf.EncryptKey
 	if conf.EncryptKey == "" {

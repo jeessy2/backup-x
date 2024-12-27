@@ -45,10 +45,10 @@
 
     |  说明   | 备份脚本  |
     |  ----  | ----  |
-    | 备份单个  | PGPASSWORD="#{PWD}" pg_dump --host 127.0.0.1 --port 5432 --dbname name --user postgres --create --file #{DATE}.sql |
-    | 备份全部  | PGPASSWORD="#{PWD}" pg_dumpall --host 127.0.0.1 --port 5432 --user postgres --create --file #{DATE}.sql |
-    | 还原  | psql -U postgres -f 2021-11-12_10_29.sql |
-    | 还原指定  | psql -U postgres -d name -f 2021-11-12_10_29.sql |
+    | 备份单个  | PGPASSWORD="#{PWD}" pg_dump --host 127.0.0.1 --port 5432 --user postgres --dbname name --format=custom --file #{DATE}.dump |
+    | 还原指定  | pg_restore --host 127.0.0.1 --port 5432 --user postgres -d name 2021-11-12-10-29.dump |
+    | 备份全部  | PGPASSWORD="#{PWD}" pg_dumpall --host 127.0.0.1 --port 5432 --user postgres --clean --file #{DATE}.sql |
+    | 还原全部  | psql -U postgres -f 2021-11-12-10-29.sql |
 
  -  mysql/mariadb
 

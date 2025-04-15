@@ -35,7 +35,7 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-
     && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get -y update
 
-RUN apt-get install -y postgresql-client-16 \
+RUN apt-get install -y postgresql-client-17 \
     && apt-get install -y default-mysql-client
 
 # add RCLone to use directly

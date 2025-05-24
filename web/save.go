@@ -102,6 +102,7 @@ func Save(writer http.ResponseWriter, request *http.Request) {
 	conf.AccessKey = strings.TrimSpace(request.FormValue("AccessKey"))
 	conf.SecretKey = strings.TrimSpace(request.FormValue("SecretKey"))
 	conf.BucketName = strings.TrimSpace(request.FormValue("BucketName"))
+	conf.Region = strings.TrimSpace(request.FormValue("Region"))
 
 	if conf.SecretKey != "" && conf.SecretKey != oldConf.SecretKey {
 		secretKey, err := util.EncryptByEncryptKey(conf.EncryptKey, conf.SecretKey)

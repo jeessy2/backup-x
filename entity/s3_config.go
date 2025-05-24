@@ -20,6 +20,7 @@ type S3Config struct {
 	AccessKey  string
 	SecretKey  string
 	BucketName string
+	Region     string
 }
 
 var ErrS3Empty = errors.New("s3 config is empty")
@@ -51,7 +52,10 @@ func (s3Config S3Config) getSession() (*session.Session, error) {
 	}
 
 	region := "cn-north-1"
-	if strings.HasSuffix(s3Config.Endpoint, "amazonaws.com") {
+	// 优先使用配置的Region
+	if s3Config.Region != "" {
+		region = s3Config.Region
+	} else if strings.HasSuffix(s3Config.Endpoint, "amazonaws.com") {
 		sp := strings.Split(s3Config.Endpoint, ".")
 		if len(sp) > 1 {
 			region = sp[1]

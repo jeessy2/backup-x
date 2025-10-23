@@ -43,7 +43,7 @@ func GetHTTPResponseOrg(resp *http.Response, url string, err error) ([]byte, err
 	if resp.StatusCode >= 300 {
 		errMsg := fmt.Sprintf("请求接口 %s 失败! 返回内容: %s ,返回状态码: %d\n", url, string(body), resp.StatusCode)
 		log.Println(errMsg)
-		err = fmt.Errorf(errMsg)
+		err = fmt.Errorf("%s", errMsg)
 	}
 
 	return body, err

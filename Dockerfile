@@ -1,5 +1,5 @@
 # build stage
-FROM golang:1.20 AS builder
+FROM golang:1.25 AS builder
 
 WORKDIR /app
 COPY . .
@@ -7,7 +7,7 @@ RUN go env -w GO111MODULE=on \
     && make clean test build
 
 # build s3sync
-FROM golang:1.20 AS s3sync
+FROM golang:1.25 AS s3sync
 
 WORKDIR /src/
 RUN git clone https://github.com/jeessy2/s3sync.git
@@ -22,7 +22,7 @@ RUN go mod tidy && \
 FROM minio/mc:latest AS mc
 
 # final stage
-FROM debian:stable-slim
+FROM debian:bookworm-slim
 
 LABEL name=backup-x
 LABEL url=https://github.com/jeessy2/backup-x
@@ -35,7 +35,7 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-
     && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get -y update
 
-RUN apt-get install -y postgresql-client-17 \
+RUN apt-get install -y postgresql-client-18 \
     && apt-get install -y default-mysql-client
 
 # add RCLone to use directly
